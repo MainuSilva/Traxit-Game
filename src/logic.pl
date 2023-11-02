@@ -13,7 +13,6 @@ move([CP, CB, _, _, _], C-SC-SR-EC-ER, [CP, NB, _, _, _]):-
     replace_nested(ER, EC, CB, CP, NB_),
     replace_nested(SR, SC, NB_, o, NB).
 
-
 %% can_move(+GameState, ?Move)
 %
 % Checks if a move is possible given the current game state

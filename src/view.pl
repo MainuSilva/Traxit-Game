@@ -23,8 +23,7 @@ display_player_modes(Color):-
     format(" Choose the type of player for ~w: \n", [PlayerColor]),
     write('       1. Human Player            \n'),
     write('       2. Easy Computer           \n'),
-    write('       3. Medium Computer         \n'),
-    write('       4. Hard Computer           \n').
+    write('       3. Hard Computer           \n').
 
 %% display_board(+GameState)
 %
