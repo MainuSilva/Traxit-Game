@@ -8,7 +8,7 @@
 % @param Game state
 % @param Move to execute
 % @param Resulting game state
-move([CP, CB, _, _, _], C-SC-SR-EC-ER, [CP, NB, _, _, _]):-
+move([CP, CB, R, WS, BS], C-SC-SR-EC-ER, [CP, NB, R, WS, BS]):-
     can_move([CP, CB, _, _, _], C-SC-SR-EC-ER),
     replace_nested(ER, EC, CB, CP, NB_),
     replace_nested(SR, SC, NB_, o, NB).
@@ -24,24 +24,44 @@ can_move([CP, CB, _, _, _], C-SC-SR-EC-ER):-
     nth0_nested(ER, EC, CB, 'o'),
     card_move(CB, C-SC-SR-EC-ER).
 
-rotate90cw(C, R, NC, NR) :-
-    NC is R,
-    NR is -C.
-
 % Generate all possible paths by rotating the given path.
-generate_all_paths(P, AP) :-
-    rotate_path(P, AP, 0).
+generate_all_moves(P, AP) :-
+    generate_all_moves(P, AP, 0).
 
-% Rotate a path to generate a new path.
-rotate_path(P, [P | Rest], R) :-
-    rotate_coordinates(P, RP),
+generate_all_moves(_, _, 4).
+
+% Rotate a path to generate a new path and collect it in the result list.
+generate_all_moves(P, [P | Rest], R) :-
+    rotate_positions(P, RP),
     NR is R + 1,
-    rotate_path(RP, Rest, NR).
-rotate_path(_, [], 4).
+    generate_all_moves(RP, Rest, NR).
+
+% Rotate a list of positions (list of lists) by 90 degrees.
+rotate_positions([], []).
+rotate_positions([P | Rest], [RP | RRest]) :-
+    rotate_coordinates(P, RP),
+    rotate_positions(Rest, RRest).
 
 % Rotate coordinates based on your requirements.
 rotate_coordinates([C, R], [NC, NR]) :-
     rotate90cw(C, R, NC, NR). 
+
+rotate90cw(C, R, NC, NR) :-
+    NC is R,
+    NR is -C.
+
+generate_all_paths(_, _, [], []).
+
+generate_all_paths(SC, SR, [M | RestAM], [AM | RestAP]) :-
+    adjust_coordinates(SC, SR, M, AM),
+    generate_all_paths(SC, SR, RestAM, RestAP).
+
+% Adjust coordinates by adding SC and SR.
+adjust_coordinates(_, _, [], []).
+adjust_coordinates(SC, SR, [[SC0, SR0] | RestM], [[SC1, SR1] | RestAM]) :-
+    SC1 is SC0 + SC,
+    SR1 is SR0 + SR,
+    adjust_coordinates(SC, SR, RestM, RestAM).
 
 % filter_paths(+Paths, +FinalX, +FinalY, +GameBoard, -ValidPaths)
 %
@@ -81,9 +101,8 @@ is_empty_path([[C, R]|Rest], CB) :-
 % @param P: The path
 % @param FC: Final Collumn
 % @param FR: Final Row
-path_ends_in([FC, FR], FC, FR).
-path_ends_in([_|Rest], FC, FR) :-
-    path_ends_in(Rest, FC, FR). 
+path_ends_in(P, FC, FR) :-
+    last(P, [FC, FR]).
                    
 %% card_move(+Move)
 %
@@ -91,54 +110,65 @@ path_ends_in([_|Rest], FC, FR) :-
 %
 % @param Move´
 card_move(CB, 1-SC-SR-EC-ER) :-
-    generate_all_paths([[1 + SC, SR]], AP),
-    filter_paths(AP, EC, ER, CB, ValidPaths),
-    ValidPaths \= [].
+    generate_all_moves([[1, 0]], AM),
+    generate_all_paths(SC, SR, AM, AP),!,
+    filter_paths(AP, EC, ER, CB, VP),
+    VP \= [].
     
 card_move(CB, 2-SC-SR-EC-ER) :-
-    generate_all_paths([[1 + SC, SR], [2 + SC, SR], [3 + SC, SR], [3 + SC, SR - 1]], AP),
-    filter_paths(AP, EC, ER, CB, ValidPaths),
-    ValidPaths \= [].                           
-    
+    generate_all_moves([[1, 0], [2, 0], [3, 0], [3, -1]], AM),
+    generate_all_paths(SC, SR, AM, AP),
+    filter_paths(AP, EC, ER, CB, VP),
+    VP \= [].                        
+      
 card_move(CB, 3-SC-SR-EC-ER) :-
-    generate_all_paths([[1 + SC, SR], [2 + SC, SR], [3 + SC, SR], [3 + SC, SR - 1]], AP),
-    filter_paths(AP, EC, ER, CB, ValidPaths),
-    ValidPaths \= [].
+    generate_all_moves([[1, 0], [2, 0], [3, 0], [3, 1]], AM),
+    generate_all_paths(SC, SR, AM, AP),
+    filter_paths(AP, EC, ER, CB, VP),
+    VP \= [].
         
 card_move(CB, 4-SC-SR-EC-ER) :-
-    generate_all_paths([[1 + SC, SR], [2 + SC, SR], [3 + SC, SR], [4 + SC, SR]], AP),
-    filter_paths(AP, EC, ER, CB, ValidPaths),
-    ValidPaths \= [].
+    generate_all_moves([[1, 0], [2, 0], [3, 0], [4, 0]], AM),
+    generate_all_paths(SC, SR, AM, AP),
+    filter_paths(AP, EC, ER, CB, VP),
+    VP \= [].
 
 card_move(CB, 5-SC-SR-EC-ER) :-
-    generate_all_paths([[SC, SR + 1], [1 + SC, SR + 1], [2 + SC, SR + 1], [3 + SC, SR + 1] , [3 + SC, SR]], AP),
-    filter_paths(AP, EC, ER, CB, ValidPaths),
-    ValidPaths \= [].
+    generate_all_moves([[0, 1], [1, 1], [2, 1], [3, 1] , [3, 0]], AM),
+    generate_all_paths(SC, SR, AM, AP),
+    filter_paths(AP, EC, ER, CB, VP),
+    VP \= [].
 
 card_move(CB, 6-SC-SR-EC-ER) :-
-    generate_all_paths([[1 + SC, SR], [2 + SC, SR], [2 + SC, SR - 1]], AP),
-    filter_paths(AP, EC, ER, CB, ValidPaths),
-    ValidPaths \= [].
+    generate_all_moves([[1, 0], [2, 0], [2, -1]], AM),
+    generate_all_paths(SC, SR, AM, AP),
+    filter_paths(AP, EC, ER, CB, VP),
+    VP \= [].
 
 card_move(CB, 7-SC-SR-EC-ER) :-
-    generate_all_paths([[1 + SC, SR], [2 + SC, SR], [2 + SC, SR + 1]], AP),
-    filter_paths(AP, EC, ER, CB, ValidPaths),
-    ValidPaths \= [].
+    generate_all_moves([[1, 0], [2, 0], [2, 1]], AM),
+    generate_all_paths(SC, SR, AM, AP),
+    filter_paths(AP, EC, ER, CB, VP),
+    VP \= [].
 
 card_move(CB, 8-SC-SR-EC-ER) :-
-    generate_all_paths([[1 + SC, SR], [2 + SC, SR]], AP),
-    filter_paths(AP, EC, ER, CB, ValidPaths),
-    ValidPaths \= [].
+    generate_all_moves([[1, 0], [2, 0]], AM),
+    generate_all_paths(SC, SR, AM, AP),
+    filter_paths(AP, EC, ER, CB, VP),
+    VP \= [].
 
 card_move(CB, 9-SC-SR-EC-ER) :-
-    generate_all_paths([[1 + SC, SR], [2 + SC, SR], [3 + SC, SR], [3 + SC, SR - 1], [3 + SC, SR - 2]], AP),
-    filter_paths(AP, EC, ER, CB, ValidPaths),
-    ValidPaths \= [].
+    generate_all_moves([[1, 0], [2, 0], [3, SR], [3, -1], [3, -2]], AM),
+    generate_all_paths(SC, SR, AM, AP),
+    filter_paths(AP, EC, ER, CB, VP),
+    VP \= [].
 
 card_move(CB, 10-SC-SR-EC-ER) :-
-    generate_all_paths([[1 + SC, SR + 1]], AP),
-    filter_paths(AP, EC, ER, CB, ValidPaths),
-    ValidPaths \= [].
+    generate_all_moves([[1, 1]], AM),
+    generate_all_paths(SC, SR, AM, AP),
+    filter_paths(AP, EC, ER, CB, VP),
+    VP \= [].
+
 
 %% nth0_nested(?Row, ?Col, ?List, ?Elem)
 %
@@ -164,17 +194,18 @@ parse_move(SS-ES, C, C-SC-SR-EC-ER):-
     nonvar(SS), nonvar(ES), !,
     atom_chars(SS, SS_),
     atom_chars(ES, ES_),
-    parse_square(SS_, SC-SR),
-    parse_square(ES_, EC-ER).
+    parse_square(SS_, SC, SR),
+    parse_square(ES_, EC, ER).
 
 %% parse_square(+AlgebraicNotation, ?Square)
 %
 %  Parses a move in algebraic notation to a game move
 %
 % @param Algebraic notation
-% @param Square position
-parse_square([H|T], C-R):-
-    char_code('A', AC),
+% @param Collumn
+% @param Row
+parse_square([H|T], C, R):-
+    char_code('a', AC),
     char_code(H, CC), 
     C is CC - AC, % determine H with ascci code
     catch(number_chars(IR,T), _, fail),
