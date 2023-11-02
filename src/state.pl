@@ -3,10 +3,10 @@
 %% initial_state(-GameState)
 %
 % Generates an initial game state for Traxit
-% Uses a list containing 5 elements: Current player, Current board, Old board, Round, White Score and Black Score.
+% Uses a list containing 5 elements: Current player, Current board, Round, White Score and Black Score.
 %
 % @param Initial game state
-initial_state([_, B, B, 0, 0, 0]):-
+initial_state([_, B, 0, 0, 0]):-
     S = 8, % Board size 8x8
     replicate_nested(S, S, o, SB),
     % Place two black pawns in C8 and F8
@@ -20,6 +20,11 @@ initial_state([_, B, B, 0, 0, 0]):-
     replace_nested(2, 5, TB5, x, TB6),
     replace_nested(5, 2, TB6, x, TB7),
     replace_nested(5, 5, TB7, x, B).
+
+game_over([_, _, _, WS, BS], W) :-
+    (WS > BS -> W = 'White';
+     BS > WS -> W = 'Black';
+     W = 'Tie').
 
 %% replicate_nested(?Height, ?Width, ?Elem, ?List)
 %

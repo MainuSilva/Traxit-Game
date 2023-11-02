@@ -1,7 +1,3 @@
-game_over([_, _, _, _, WS, BS], W) :-
-    (WS > BS -> W = 'White';
-     BS > WS -> W = 'Black';
-     W = 'Tie').
 
 %% move(+GameState, ?Move, ?NewGameState)
 %
@@ -13,8 +9,8 @@ game_over([_, _, _, _, WS, BS], W) :-
 % @param Game state
 % @param Move to execute
 % @param Resulting game state
-move([CP, CB, OB, _, _, _], C-SC-SR-EC-ER, [CP, NB, CB, _, _, _]):-
-    can_move([CP, CB, OB, _, _, _], C-SC-SR-EC-ER),
+move([CP, CB, _, _, _], C-SC-SR-EC-ER, [CP, NB, _, _, _]):-
+    can_move([CP, CB, _, _, _], C-SC-SR-EC-ER),
     replace_nested(ER, EC, CB, CP, NB_),
     replace_nested(SR, SC, NB_, o, NB).
 
@@ -25,19 +21,10 @@ move([CP, CB, OB, _, _, _], C-SC-SR-EC-ER, [CP, NB, CB, _, _, _]):-
 %
 % @param Game state
 % @param Move to verify
-can_move([CP, CB, _, _, _, _], C-SC-SR-EC-ER):-
+can_move([CP, CB, _, _, _], C-SC-SR-EC-ER):-
     nth0_nested(SR, SC, CB, CP),
     nth0_nested(ER, EC, CB, 'o'),
-    valid_card(C),
     card_move(CB, C-SC-SR-EC-ER).
-
-%% valid_card(+Card)
-%
-% Checks if the card corresponds to a valid card
-%
-% @param Mode
-valid_card(C):-
-   nonvar(C), C >= 1, C =< 10.
 
 rotate90cw(C, R, NC, NR) :-
     NC is R,
@@ -155,7 +142,6 @@ card_move(CB, 10-SC-SR-EC-ER) :-
     filter_paths(AP, EC, ER, CB, ValidPaths),
     ValidPaths \= [].
 
-
 %% nth0_nested(?Row, ?Col, ?List, ?Elem)
 %
 % Executes the nth0 predicate in a 2 dimensional list, allowing
@@ -174,9 +160,10 @@ nth0_nested(R, C, L, E):-
 % Parses a move in algebraic notation to a game move
 %
 % @param Algebraic notation
+% @param Card number
 % @param Move
-parse_move(C-SS-ES, C-SC-SR-EC-ER):-
-    nonvar(C), nonvar(SS), nonvar(ES), !,
+parse_move(SS-ES, C, C-SC-SR-EC-ER):-
+    nonvar(SS), nonvar(ES), !,
     atom_chars(SS, SS_),
     atom_chars(ES, ES_),
     parse_square(SS_, SC-SR),
@@ -195,14 +182,14 @@ parse_square([H|T], C-R):-
     catch(number_chars(IR,T), _, fail),
     R is 8 - IR. % calculate row index
 
-change_round_score([_, _, _, _, WS, BS], SNGS):-
+change_round_score([_, _, _, WS, BS], SNGS):-
     value([_, _, _, _, WS, BS], w, WV),
     value([_, _, _, _, WS, BS], b, BV),
     FWS is WS + WV,
     FBS is BS + BV,
     SNGS = [_, _, _, _, FWS, FBS].
 
-value([_, CB, _, _, _, _], P, V) :-
+value([_, CB, _, _, _], P, V) :-
     get_pawn_positions(CB, P, Pos), % Get pawn positions for the player
     calculate_score(Pos, V). % Calculate the value based on positions
 
