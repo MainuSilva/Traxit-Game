@@ -9,7 +9,7 @@
 %
 % @param Mode
 valid_player_mode(M):-
-   nonvar(M), M >= 1, M =< 4.
+   nonvar(M), M >= 1, M =< 3.
 
 %% valid_card(+Card)
 %
@@ -27,25 +27,19 @@ valid_card(C):-
 :- dynamic player/2, state/1.
 menu:-
     display_logo,
-    get_player_mode(w, MW),
+    
+    display_player_modes(w),
+    repeat,
+    catch((get_player_mode(MW)),_,(write('Invalid input. Try again\n'), fail)),
     assertz(player(w, MW)),
-    get_player_mode(b, MB),
+    
+    display_player_modes(b),
+    repeat,
+    catch((get_player_mode(MB)),_,(write('Invalid input. Try again\n'), fail)),
     assertz(player(b, MB)),
+    
     initial_state(GS),
     assertz(state(GS)).
-
-%% get_player_mode(+Player, -Mode)
-%
-% Retrieves the game mode for a Player from the user
-%
-% @param Player to assign mode
-% @param Mode choosen
-get_player_mode(P, M):-
-    repeat,
-    display_player_modes(P),
-    read(M),
-    catch(char_code(_, M), _, fail),
-    valid_player_mode(M).
 
 
 %% play
@@ -56,7 +50,6 @@ play:-
     retractall(player(_,_)),
     retractall(state(_)),
     menu,
-    skip_line,
     state(GS),
     play_game(GS).
 
@@ -96,7 +89,7 @@ play_round([CP, CB, R, _, _], NGS) :-
     get_current_player([CP, _, R, _, _], P1),
     player(P1, 1), % human player
     display_board([P1, CB, _,_ ,_]),
-    display_choose_card(CP), % Last player chooses next player's move.
+    display_choose_card(P1), % Last player chooses next player's move.
     repeat,
     catch((get_card(C)),_,(write('Invalid input. Try again\n'), fail)),
     display_choose_move(P1, C),
@@ -105,6 +98,14 @@ play_round([CP, CB, R, _, _], NGS) :-
     try_move([P1, CB, _,_ ,_], M, NGS),
     skip_line, !.
 
+%% get_player_mode(-Mode)
+%
+% Retrieves the game mode for a Player from the user
+%
+% @param Mode choosen
+get_player_mode(M):-
+    read(M),
+    (valid_player_mode(M) -> !; (write('Invalid Mode. Try again\n'), get_player_mode(M))).
 
 %% get_card(+Card)
 %
@@ -131,19 +132,17 @@ try_move([CP, CB, _,_ ,_], M, NGS):-
 % @param Move with valid notation
 get_move(M, C):-
     read(AN),
-    (parse_move(AN, C, M) -> !; (write('Invalid algebraic notation. Try again\n'), get_move(M))).
-
+    (parse_move(AN, C, M) -> !; (write('Invalid algebraic notation. Try again\n'), get_move(M, C))).
                            
 % Define a predicate to get the current player based on the round.
 get_current_player([CP, _, R, _,_], NP) :-
     (R =:= 1 -> 
         display_first_player,
         read(PC),
-        (PC = 'w' -> CP = w;
-         PC = 'b' -> CP = b;
-            % Handle invalid input.
-            display_invalid_player,
-            CP = w
+        (PC == 'w' -> NP = w;
+         PC == 'b' -> NP = b;
+        display_invalid_player,
+        NP = w
         )
     ;
         switch_player(CP, NP)

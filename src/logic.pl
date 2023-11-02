@@ -1,4 +1,3 @@
-
 %% move(+GameState, ?Move, ?NewGameState)
 %
 % Executes a move using a game state and returning a new state.

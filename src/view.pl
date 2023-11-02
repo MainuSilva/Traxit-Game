@@ -37,10 +37,10 @@ display_board([CP, CB, _, _, _]):-
     nl,
     display_separator,
     display_rows(CB),
-    nl, nl,
-    (CP = b ->
-     write('Black to play\n\n');
-     write('White to play\n\n')
+    nl,
+    (CP == 'b' ->
+     write('Black to play\n');
+     write('White to play\n')
     ).
 
 %% display_separator(+Size)
@@ -123,7 +123,7 @@ display_invalid_player:-
     write('Invalid input. Defaulting to white.'),
     nl.
 
-display_choose_card(LP) :-
+display_choose_card(CP) :-
     nl,
     write('______________________________________________________________________ '), nl,
     write('|      1      |      2      |      3      |      4      |      5      |'), nl,
@@ -137,19 +137,21 @@ display_choose_card(LP) :-
     write('|       |.|   |   |.|_|_|   |             |        |_|  |     |.|     |'), nl,
     write('|_____________|_____________|_____________|________|.|__|_____________|'), nl,
     nl,       
-    (LP == 'w' ->
+    (CP == 'b' ->
         write('White player, choose a card for the black player: ')
-    ; LP == 'b' ->
+    ;
+     CP == 'w' ->
         write('Black player, choose a card for the white player: ')
     ). 
 
 display_choose_move(CP, C):-
     nl,
     format('Choose a move in algebraic notation using card ~w: ', [C]),
-    write('e.g., 1-c1-d3'), nl,
+    write('e.g., c1-d3'), nl,
     (CP == 'w' ->
         write('White player, make your move: ')
-    ; CP == 'b' ->
+    ;
+     CP == 'b' ->
         write('Black player, make your move: ')
     ).
 
