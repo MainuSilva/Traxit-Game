@@ -134,7 +134,7 @@ try_move([CP, CB, R, WS, BS], M, NGS):-
    (move([CP, CB, R, WS, BS], M, NGS)-> !; (write('Invalid move!\n'), fail)).
 
 traxit_move([CP, CB, R, WS, BS], M, NGS):-
-   (move([CP, CB, R, WS, BS], M, NGS)-> !; (write('Invalid move!\n'), fail)).
+   (move_traxit([CP, CB, R, WS, BS], M, NGS)-> !; (write('Invalid move!\n'), fail)).
 
 %% get_move(-Move, +CardNumber)
 %
@@ -147,7 +147,7 @@ get_move(M, C):-
 
 get_traxit_move(M):-
     read(AN),
-    (parse_move(AN, M) -> !; (write('Invalid algebraic notation. Try again\n'), get_traxit_move(M))).
+    (traxit_parse_move(AN, M) -> !; (write('Invalid algebraic notation. Try again\n'), get_traxit_move(M))).
                           
 % Define a predicate to get the current player based on the round.
 get_current_player([CP, _, R, _,_], NP) :-

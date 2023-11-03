@@ -13,6 +13,11 @@ move([CP, CB, R, WS, BS], C-SC-SR-EC-ER, [CP, NB, R, WS, BS]):-
     replace_nested(ER, EC, CB, CP, NB_),
     replace_nested(SR, SC, NB_, o, NB).
 
+move_traxit([CP, CB, R, WS, BS], SC-SR-EC-ER, [CP, NB, R, WS, BS]):-
+    can_move_traxit([CP, CB, _, _, _], SC-SR-EC-ER),
+    replace_nested(ER, EC, CB, CP, NB_),
+    replace_nested(SR, SC, NB_, o, NB).
+
 %% can_move(+GameState, ?Move)
 %
 % Checks if a move is possible given the current game state
@@ -24,7 +29,15 @@ can_move([CP, CB, _, _, _], C-SC-SR-EC-ER):-
     nth0_nested(ER, EC, CB, 'o'),
     card_paths(C, SC, SR, AP), 
     filter_paths(AP, EC, ER, CB, VP),
-    VP \= [].   
+    VP \= [].
+    
+can_move_traxit([CP, CB, _, _, _], SC-SR-EC-ER):-
+    nth0_nested(SR, SC, CB, CP),
+    nth0_nested(ER, EC, CB, 'o'),
+    (EC = 0, ER = 0;
+     EC = 7, ER = 0;
+     EC = 0, ER = 7;
+     EC = 7, ER = 7).
 
 % Generate all possible paths by rotating the given path.
 generate_all_moves(P, AP) :-
@@ -208,7 +221,8 @@ parse_move(SS-ES, C, C-SC-SR-EC-ER):-
     atom_chars(ES, ES_),
     parse_square(SS_, SC, SR),
     parse_square(ES_, EC, ER).
-parse_move(SS-ES, SC-SR-EC-ER):-
+
+traxit_parse_move(SS-ES, SC-SR-EC-ER):-
     nonvar(SS), nonvar(ES), !,
     atom_chars(SS, SS_),
     atom_chars(ES, ES_),
