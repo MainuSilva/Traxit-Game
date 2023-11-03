@@ -147,20 +147,29 @@ card_paths(1, SC, SR, AP) :-
     generate_all_paths(SC, SR, AM, AP).
 
 card_paths(2, SC, SR, AP) :-
-    generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, 1]], AM),
-    generate_all_paths(SC, SR, AM, AP).   
+    generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, 1]], AM1),
+    generate_all_moves([[0, 0], [0, -1], [-1, -1], [-2, -1], [-3, -1]], AM2),
+    generate_all_paths(SC, SR, AM1, AP1),
+    generate_all_paths(SC, SR, AM2, AP2),
+    append(AP1, AP2, AP).
                        
 card_paths(3, SC, SR, AP) :-
-    generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, -1]], AM),
-    generate_all_paths(SC, SR, AM, AP).  
+    generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, -1]], AM1),
+    generate_all_moves([[0, 0], [0, 1], [-1, 1], [-2, 1], [-3, 1]], AM2),
+    generate_all_paths(SC, SR, AM1, AP1),
+    generate_all_paths(SC, SR, AM2, AP2),
+    append(AP1, AP2, AP). 
      
 card_paths(4, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]], AM),
     generate_all_paths(SC, SR, AM, AP).
 
 card_paths(5, SC, SR, AP) :-
-    generate_all_moves([[0, 0], [0, -1], [1, -1], [2, -1], [3, -1] , [3, 0]], AM),
-    generate_all_paths(SC, SR, AM, AP).
+    generate_all_moves([[0, 0], [0, -1], [1, -1], [2, -1], [3, -1] , [3, 0]], AM1),
+    generate_all_moves([[0, 0], [0, -1], [-1, -1], [-2, -1], [-3, -1] , [-3, 0]], AM2),
+    generate_all_paths(SC, SR, AM1, AP1),
+    generate_all_paths(SC, SR, AM2, AP2),
+    append(AP1, AP2, AP). 
 
 card_paths(6, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, 0], [2, 0], [2, 1]], AM),
@@ -243,7 +252,6 @@ parse_square([H|T], C, R):-
     catch(number_chars(IR,T), _, fail),
     R is 8 - IR. % calculate row index
 
-
 change_round_score([CP, CB, R, WS, BS], SNGS):-
     value([CP, CB, R, WS, BS], w, WV),
     value([CP, CB, R, WS, BS], b, BV),
@@ -254,10 +262,6 @@ change_round_score([CP, CB, R, WS, BS], SNGS):-
 value([_, CB, _, _, _], P, V) :-
     get_pawn_positions(CB, P, Pos), % Get pawn positions for the player
     calculate_score(Pos, V). % Calculate the value based on positions
-
-% Extract the two pawn positions of color P from the current board
-get_pawn_positions(CB, P, Pos) :-
-    findall([X, Y], (nth0(X, CB, R), nth0(Y, R, P)), Pos).
 
 % Calculate the score based on two pawn positions
 calculate_score(Pos, V) :-
@@ -280,6 +284,10 @@ position_score(R, C, Score) :-
     R >= 2, R =< 5, C >= 2, C =< 5 -> Score = 75;    % Next layer: 75 points
     R >= 1, R =< 6, C >= 1, C =< 6 -> Score = 50;    % Outer layer: 50 points
     Score = 25).  % Outermost layer: 25 points (default)
+
+% Extract the two pawn positions of color P from the current board
+get_pawn_positions(CB, P, Pos) :-
+    findall([X, Y], (nth0(X, CB, R), nth0(Y, R, P)), Pos).
                                    
 %% switch_player(?CurrentToPlay, ?Next)
 %
