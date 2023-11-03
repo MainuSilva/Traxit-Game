@@ -8,13 +8,13 @@
 % @param Game state
 % @param Move to execute
 % @param Resulting game state
-move([CP, CB, R, WS, BS], C-SC-SR-EC-ER, [CP, NB, R, WS, BS]):-
-    can_move([CP, CB, _, _, _], C-SC-SR-EC-ER),
+move([CP, CB, R, WC, BC, WS, BS], C-SC-SR-EC-ER, [CP, NB, R, WC, BC, WS, BS]):-
+    can_move([CP, CB, _, _, _, _, _], C-SC-SR-EC-ER),
     replace_nested(ER, EC, CB, CP, NB_),
     replace_nested(SR, SC, NB_, o, NB).
 
-move_traxit([CP, CB, R, WS, BS], SC-SR-EC-ER, [CP, NB, R, WS, BS]):-
-    can_move_traxit([CP, CB, _, _, _], SC-SR-EC-ER),
+move_traxit([CP, CB, R, WC, BC, WS, BS], SC-SR-EC-ER, [CP, NB, R, WC, BC, WS, BS]):-
+    can_move_traxit([CP, CB, _, _, _, _, _], SC-SR-EC-ER),
     replace_nested(ER, EC, CB, CP, NB_),
     replace_nested(SR, SC, NB_, o, NB).
 
@@ -24,14 +24,14 @@ move_traxit([CP, CB, R, WS, BS], SC-SR-EC-ER, [CP, NB, R, WS, BS]):-
 %
 % @param Game state
 % @param Move to verify
-can_move([CP, CB, _, _, _], C-SC-SR-EC-ER):-
+can_move([CP, CB, _, _, _, _, _], C-SC-SR-EC-ER):-
     nth0_nested(SR, SC, CB, CP),
     nth0_nested(ER, EC, CB, 'o'),
     card_paths(C, SC, SR, AP), 
     filter_paths(AP, EC, ER, CB, VP),
     VP \= [].
     
-can_move_traxit([CP, CB, _, _, _], SC-SR-EC-ER):-
+can_move_traxit([CP, CB, _, _, _, _, _], SC-SR-EC-ER):-
     nth0_nested(SR, SC, CB, CP),
     nth0_nested(ER, EC, CB, 'o'),
     (EC = 0, ER = 0;
@@ -261,14 +261,13 @@ parse_square([H|T], C, R):-
     catch(number_chars(IR,T), _, fail),
     R is 8 - IR. % calculate row index
 
-change_round_score([CP, CB, R, WS, BS], SNGS):-
+change_round_score([CP, CB, R, WC, BC, WS, BS], [CP, CB, R, WC, BC, FWS, FBS]):-
     value([CP, CB, R, WS, BS], w, WV),
     value([CP, CB, R, WS, BS], b, BV),
     FWS is WS + WV,
-    FBS is BS + BV,
-    SNGS = [CP, CB, R, FWS, FBS].
+    FBS is BS + BV.
 
-value([_, CB, _, _, _], P, V) :-
+value([_, CB, _, _, _, _, _], P, V) :-
     get_pawn_positions(CB, P, Pos), % Get pawn positions for the player
     calculate_score(Pos, V). % Calculate the value based on positions
 

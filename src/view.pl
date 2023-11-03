@@ -30,7 +30,7 @@ display_player_modes(Color):-
 % Displays the CurentBoard in a game state and its evaluation. 
 %
 % @param Game state
-display_board([CP, CB, _, _, _]):-
+display_board([CP, CB, _, _, _, _, _]):-
     nl,
     write('  |  A B C D E F G H  |'),
     nl,
@@ -101,7 +101,7 @@ display_pieces([Piece | Rest]):-
 % Displays a string announcing the game winner and the final scores
 %
 % @param Winner to congratulate
-display_winner([_, _, _, WS, BS], W) :-
+display_winner([_, _, _, _, _, WS, BS], W) :-
     nl, nl,
     (W == 'Tie' ->
         format("It's a tie! Final Score: ~d - ~d", [WS, BS])
@@ -111,7 +111,7 @@ display_winner([_, _, _, WS, BS], W) :-
     display_logo, nl, nl.
 
 % Define a predicate to display the score at the end of a scoring period.
-display_period_score([_, _, R, NWS, NBS]) :-
+display_period_score([_, _, R, _, _, NWS, NBS]) :-
     nl, nl,
     format("END OF ROUND ~d: Period Score: White: ~d - Black: ~d\n", [R, NWS, NBS]).
  

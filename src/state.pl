@@ -6,8 +6,9 @@
 % Uses a list containing 5 elements: Current player, Current board, Round, White Score and Black Score.
 %
 % @param Initial game state
-initial_state([_, B, 0, 0, 0]):-
+initial_state([_, B, 0, C, C, 0, 0]):-
     S = 8, % Board size 8x8
+    C = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     replicate_nested(S, S, o, SB),
     % Place two black pawns in C8 and F8
     replace_nested(0, 2, SB, b, TB1),
@@ -21,7 +22,7 @@ initial_state([_, B, 0, 0, 0]):-
     replace_nested(5, 2, TB6, x, TB7),
     replace_nested(5, 5, TB7, x, B).
 
-game_over([_, _, _, WS, BS], W) :-
+game_over([_, _, _, _, _, WS, BS], W) :-
     (WS > BS -> W = 'White';
      BS > WS -> W = 'Black';
      W = 'Tie').
