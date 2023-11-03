@@ -14,3 +14,4 @@ random_move(GS, CP, M) :-
 % Finds the best move for the computer player.
 best_move(GS, CP, M) :-
     
+

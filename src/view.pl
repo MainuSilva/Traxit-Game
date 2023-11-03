@@ -112,7 +112,8 @@ display_winner([_, _, _, WS, BS], W) :-
 
 % Define a predicate to display the score at the end of a scoring period.
 display_period_score([_, _, R, NWS, NBS]) :-
-    format("End of Round ~d. Period Score: White: ~d - Black: ~d\n", [R, NWS, NBS]).
+    nl, nl,
+    format("END OF ROUND ~d: Period Score: White: ~d - Black: ~d\n", [R, NWS, NBS]).
  
 display_first_player:-
     nl,
@@ -153,6 +154,13 @@ display_choose_move(CP, C):-
      CP == 'b' ->
         write('Black player, make your move: ')
     ).
+
+display_traxit(P1) :-
+    nl,
+    (P1 == 'w' -> OP = 'Black'; OP = 'White'),
+    write('TRAXIT!'),
+    nl,
+    format("~w player choose one of your adversary's pawns to move to one of the corners in algebraic notation (corners: a1, h1, a8, h8): ", [OP]).
 
 
 
