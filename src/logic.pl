@@ -22,7 +22,9 @@ move([CP, CB, R, WS, BS], C-SC-SR-EC-ER, [CP, NB, R, WS, BS]):-
 can_move([CP, CB, _, _, _], C-SC-SR-EC-ER):-
     nth0_nested(SR, SC, CB, CP),
     nth0_nested(ER, EC, CB, 'o'),
-    card_move(CB, C-SC-SR-EC-ER).
+    card_paths(C, SC, SR, AP), 
+    filter_paths(AP, EC, ER, CB, VP),
+    VP \= [].   
 
 % Generate all possible paths by rotating the given path.
 generate_all_moves(P, AP) :-
@@ -63,36 +65,54 @@ adjust_coordinates(SC, SR, [[SC0, SR0] | RestM], [[SC1, SR1] | RestAM]) :-
     SR1 is SR0 + SR,
     adjust_coordinates(SC, SR, RestM, RestAM).
 
-% filter_paths(+Paths, +FinalX, +FinalY, +GameBoard, -ValidPaths)
-%
-% Filters paths based on two conditions:
-% 1. Whether a path ends in the final position [FinalX, FinalY].
-% 2. Whether all positions in the path are empty on the GameBoard.
-%
-% @param P: List of paths
-% @param FC: Final X-coordinate
-% @param FR: Final Y-coordinate
-% @param CB: The game board
-% @param VP: List of valid paths
 filter_paths([], _, _, _, []).
 filter_paths([P|Rest], FC, FR, CB, VP) :-
-    (path_ends_in(P, FC, FR), is_empty_path(P, CB) ->
+    (path_ends_in(P, FC, FR), is_valid_path(P, CB) ->
         VP = [P|VR]
     ; 
         VP = VR
     ),
     filter_paths(Rest, FC, FR, CB, VR).
 
-% is_empty_path(+Path, +GameBoard)
+filter_paths([], _, []).
+filter_paths([P|Rest], CB, VP) :-
+    (is_valid_path(P, CB) ->
+        VP = [P|VR]
+    ; 
+        VP = VR
+    ),
+    filter_paths(Rest, CB, VR).
+
+% is_valid_path(+Path, +GameBoard)
 %
-% Checks if all positions in the path are empty on the GameBoard.
+% Checks if all positions in the path are empty and empty on the GameBoard, excluding the first element.
 %
 % @param P: The path
 % @param CB: The game board
-is_empty_path([], _).
-is_empty_path([[C, R]|Rest], CB) :-
+is_valid_path(P, CB) :- % The first element of the path is skipped
+    skip_first_element(P, Rest),
+    check_valid_path(Rest, CB).
+
+% skip_first_element(+List, -Rest)
+%
+% Skips the first element of a list, returning the rest of the list.
+%
+% @param List: The input list
+% @param Rest: The list without the first element
+skip_first_element([_ | Rest], Rest).
+
+% check_valid_path(+Path, +GameBoard)
+%
+% Checks if all positions in the path are valid and empty on the GameBoard.
+%
+% @param P: The path
+% @param CB: The game board
+check_valid_path([], _).
+check_valid_path([[C, R] | Rest], CB) :-
+    C >= 0, 
+    R >= 0, 
     nth0_nested(R, C, CB, 'o'),
-    is_empty_path(Rest, CB). 
+    check_valid_path(Rest, CB).
 
 % path_ends_in(+Path, +FinalX, +FinalY)
 %
@@ -104,72 +124,64 @@ is_empty_path([[C, R]|Rest], CB) :-
 path_ends_in(P, FC, FR) :-
     last(P, [FC, FR]).
                    
-%% card_move(+Move)
+% card_paths(+CardNumber, +StartColumn, +StartRow, -AllPaths)
 %
-% Checks if the given move is the card move associated
+% Generates all paths for the specified card number and starting position.
 %
 % @param Move´
-card_move(CB, 1-SC-SR-EC-ER) :-
-    generate_all_moves([[1, 0]], AM),
-    generate_all_paths(SC, SR, AM, AP),!,
-    filter_paths(AP, EC, ER, CB, VP),
-    VP \= [].
-    
-card_move(CB, 2-SC-SR-EC-ER) :-
-    generate_all_moves([[1, 0], [2, 0], [3, 0], [3, -1]], AM),
-    generate_all_paths(SC, SR, AM, AP),
-    filter_paths(AP, EC, ER, CB, VP),
-    VP \= [].                        
-      
-card_move(CB, 3-SC-SR-EC-ER) :-
-    generate_all_moves([[1, 0], [2, 0], [3, 0], [3, 1]], AM),
-    generate_all_paths(SC, SR, AM, AP),
-    filter_paths(AP, EC, ER, CB, VP),
-    VP \= [].
-        
-card_move(CB, 4-SC-SR-EC-ER) :-
-    generate_all_moves([[1, 0], [2, 0], [3, 0], [4, 0]], AM),
-    generate_all_paths(SC, SR, AM, AP),
-    filter_paths(AP, EC, ER, CB, VP),
-    VP \= [].
+card_paths(1, SC, SR, AP) :-
+    generate_all_moves([[0, 0], [1, 0]], AM),
+    generate_all_paths(SC, SR, AM, AP).
 
-card_move(CB, 5-SC-SR-EC-ER) :-
-    generate_all_moves([[0, 1], [1, 1], [2, 1], [3, 1] , [3, 0]], AM),
-    generate_all_paths(SC, SR, AM, AP),
-    filter_paths(AP, EC, ER, CB, VP),
-    VP \= [].
+card_paths(2, SC, SR, AP) :-
+    generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, 1]], AM),
+    generate_all_paths(SC, SR, AM, AP).   
+                       
+card_paths(3, SC, SR, AP) :-
+    generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, -1]], AM),
+    generate_all_paths(SC, SR, AM, AP).  
+     
+card_paths(4, SC, SR, AP) :-
+    generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]], AM),
+    generate_all_paths(SC, SR, AM, AP).
 
-card_move(CB, 6-SC-SR-EC-ER) :-
-    generate_all_moves([[1, 0], [2, 0], [2, -1]], AM),
-    generate_all_paths(SC, SR, AM, AP),
-    filter_paths(AP, EC, ER, CB, VP),
-    VP \= [].
+card_paths(5, SC, SR, AP) :-
+    generate_all_moves([[0, 0], [0, -1], [1, -1], [2, -1], [3, -1] , [3, 0]], AM),
+    generate_all_paths(SC, SR, AM, AP).
 
-card_move(CB, 7-SC-SR-EC-ER) :-
-    generate_all_moves([[1, 0], [2, 0], [2, 1]], AM),
-    generate_all_paths(SC, SR, AM, AP),
-    filter_paths(AP, EC, ER, CB, VP),
-    VP \= [].
+card_paths(6, SC, SR, AP) :-
+    generate_all_moves([[0, 0], [1, 0], [2, 0], [2, 1]], AM),
+    generate_all_paths(SC, SR, AM, AP).
 
-card_move(CB, 8-SC-SR-EC-ER) :-
-    generate_all_moves([[1, 0], [2, 0]], AM),
-    generate_all_paths(SC, SR, AM, AP),
-    filter_paths(AP, EC, ER, CB, VP),
-    VP \= [].
+card_paths(7, SC, SR, AP) :-
+    generate_all_moves([[0, 0], [1, 0], [2, 0], [2, -1]], AM),
+    generate_all_paths(SC, SR, AM, AP).
 
-card_move(CB, 9-SC-SR-EC-ER) :-
-    generate_all_moves([[1, 0], [2, 0], [3, SR], [3, -1], [3, -2]], AM),
-    generate_all_paths(SC, SR, AM, AP),
-    filter_paths(AP, EC, ER, CB, VP),
-    VP \= [].
+card_paths(8, SC, SR, AP) :-
+    generate_all_moves([[0, 0], [1, 0], [2, 0]], AM),
+    generate_all_paths(SC, SR, AM, AP).
 
-card_move(CB, 10-SC-SR-EC-ER) :-
-    generate_all_moves([[1, 1]], AM),
-    generate_all_paths(SC, SR, AM, AP),
-    filter_paths(AP, EC, ER, CB, VP),
-    VP \= [].
+card_paths(9, SC, SR, AP) :-
+    generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, 1], [3, 2]], AM),
+    generate_all_paths(SC, SR, AM, AP).
 
+card_paths(10, SC, SR, AP) :-
+    generate_all_moves([[0, 0], [1, -1]], AM),
+    generate_all_paths(SC, SR, AM, AP).
 
+pawns_card_paths(C, P,  CB, VP) :-
+   get_pawn_positions(CB, P, Pos),
+   nth0(0, Pos, [R1, C1]),
+   nth0(1, Pos, [R2, C2]),
+   card_paths(C, C1, R1, AP1),
+   card_paths(C, C2, R2, AP2),
+   append(AP1, AP2, AP),
+   filter_paths(AP, CB, VP).
+                           
+verify_traxit(C, P, CB) :-   
+    pawns_card_paths(C, P,  CB, VP),
+    VP = [].
+   
 %% nth0_nested(?Row, ?Col, ?List, ?Elem)
 %
 % Executes the nth0 predicate in a 2 dimensional list, allowing
@@ -196,6 +208,12 @@ parse_move(SS-ES, C, C-SC-SR-EC-ER):-
     atom_chars(ES, ES_),
     parse_square(SS_, SC, SR),
     parse_square(ES_, EC, ER).
+parse_move(SS-ES, SC-SR-EC-ER):-
+    nonvar(SS), nonvar(ES), !,
+    atom_chars(SS, SS_),
+    atom_chars(ES, ES_),
+    parse_square(SS_, SC, SR),
+    parse_square(ES_, EC, ER).
 
 %% parse_square(+AlgebraicNotation, ?Square)
 %
@@ -211,12 +229,13 @@ parse_square([H|T], C, R):-
     catch(number_chars(IR,T), _, fail),
     R is 8 - IR. % calculate row index
 
-change_round_score([_, _, _, WS, BS], SNGS):-
-    value([_, _, _, _, WS, BS], w, WV),
-    value([_, _, _, _, WS, BS], b, BV),
+
+change_round_score([CP, CB, R, WS, BS], SNGS):-
+    value([CP, CB, R, WS, BS], w, WV),
+    value([CP, CB, R, WS, BS], b, BV),
     FWS is WS + WV,
     FBS is BS + BV,
-    SNGS = [_, _, _, _, FWS, FBS].
+    SNGS = [CP, CB, R, FWS, FBS].
 
 value([_, CB, _, _, _], P, V) :-
     get_pawn_positions(CB, P, Pos), % Get pawn positions for the player
@@ -224,28 +243,28 @@ value([_, CB, _, _, _], P, V) :-
 
 % Extract the two pawn positions of color P from the current board
 get_pawn_positions(CB, P, Pos) :-
-    findall([X, Y], (nth0(X, CB, Row), nth0(Y, Row, P)), Pos).
+    findall([X, Y], (nth0(X, CB, R), nth0(Y, R, P)), Pos).
 
 % Calculate the score based on two pawn positions
 calculate_score(Pos, V) :-
     % Calculate the score for the first position
-    nth0(0, Pos, [X1, Y1]),
-    position_score(X1, Y1, S1),
+    nth0(0, Pos, [R1, C1]),
+    position_score(R1, C1, S1),
     
     % Calculate the score for the second position
-    nth0(1, Pos, [X2, Y2]),
-    position_score(X2, Y2, S2),
+    nth0(1, Pos, [R2, C2]),
+    position_score(R2, C2, S2),
     
     % Sum the scores for the two positions
     V is S1 + S2.
 
 % Define a predicate to calculate the score for a single position
-position_score(X, Y, Score) :-
+position_score(R, C, Score) :-
     % Define the scoring logic based on the position (X, Y)
     % Here's an example scoring logic based on your description:
-    (X >= 3, X =< 4, Y >= 3, Y =< 4 -> Score = 100;  % Center: 100 points
-    X >= 2, X =< 5, Y >= 2, Y =< 5 -> Score = 75;    % Next layer: 75 points
-    X >= 1, X =< 6, Y >= 1, Y =< 6 -> Score = 50;    % Outer layer: 50 points
+    (R >= 3, R =< 4, C >= 3, C =< 4 -> Score = 100;  % Center: 100 points
+    R >= 2, R =< 5, C >= 2, C =< 5 -> Score = 75;    % Next layer: 75 points
+    R >= 1, R =< 6, C >= 1, C =< 6 -> Score = 50;    % Outer layer: 50 points
     Score = 25).  % Outermost layer: 25 points (default)
                                    
 %% switch_player(?CurrentToPlay, ?Next)
