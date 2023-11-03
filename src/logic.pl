@@ -172,20 +172,29 @@ card_paths(5, SC, SR, AP) :-
     append(AP1, AP2, AP). 
 
 card_paths(6, SC, SR, AP) :-
-    generate_all_moves([[0, 0], [1, 0], [2, 0], [2, 1]], AM),
-    generate_all_paths(SC, SR, AM, AP).
+    generate_all_moves([[0, 0], [1, 0], [2, 0], [2, 1]], AM1),
+    generate_all_moves([[0, 0], [0, -1], [-1, -1], [-2, -1]], AM2),
+    generate_all_paths(SC, SR, AM1, AP1),
+    generate_all_paths(SC, SR, AM2, AP2),
+    append(AP1, AP2, AP). 
 
 card_paths(7, SC, SR, AP) :-
-    generate_all_moves([[0, 0], [1, 0], [2, 0], [2, -1]], AM),
-    generate_all_paths(SC, SR, AM, AP).
+    generate_all_moves([[0, 0], [1, 0], [2, 0], [2, -1]], AM1),
+    generate_all_moves([[0, 0], [0, 1], [-1, 1], [-2, 1]], AM2),
+    generate_all_paths(SC, SR, AM1, AP1),
+    generate_all_paths(SC, SR, AM2, AP2),
+    append(AP1, AP2, AP). 
 
 card_paths(8, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, 0], [2, 0]], AM),
     generate_all_paths(SC, SR, AM, AP).
 
 card_paths(9, SC, SR, AP) :-
-    generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, 1], [3, 2]], AM),
-    generate_all_paths(SC, SR, AM, AP).
+    generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, 1], [3, 2]], AM1),
+    generate_all_moves([[0, 0], [0, -1], [0, -2], [-1, -2], [-2, -2], [-3, -2]], AM2),
+    generate_all_paths(SC, SR, AM1, AP1),
+    generate_all_paths(SC, SR, AM2, AP2),
+    append(AP1, AP2, AP). 
 
 card_paths(10, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, -1]], AM),
@@ -195,8 +204,8 @@ pawns_card_paths(C, P,  CB, VP) :-
    get_pawn_positions(CB, P, Pos),
    nth0(0, Pos, [R1, C1]),
    nth0(1, Pos, [R2, C2]),
-   card_paths(C, C1, R1, AP1),
-   card_paths(C, C2, R2, AP2),
+   card_paths(C, C1, R1, AP1),!,
+   card_paths(C, C2, R2, AP2),!,
    append(AP1, AP2, AP),
    filter_paths(AP, CB, VP).
                            
@@ -281,9 +290,9 @@ position_score(R, C, Score) :-
     % Define the scoring logic based on the position (X, Y)
     % Here's an example scoring logic based on your description:
     (R >= 3, R =< 4, C >= 3, C =< 4 -> Score = 100;  % Center: 100 points
-    R >= 2, R =< 5, C >= 2, C =< 5 -> Score = 75;    % Next layer: 75 points
-    R >= 1, R =< 6, C >= 1, C =< 6 -> Score = 50;    % Outer layer: 50 points
-    Score = 25).  % Outermost layer: 25 points (default)
+    R >= 2, R =< 5, C >= 2, C =< 5 -> Score = 50;    % Next layer: 75 points
+    R >= 1, R =< 6, C >= 1, C =< 6 -> Score = 25;    % Outer layer: 50 points
+    Score = 0).  % Outermost layer: 25 points (default)
 
 % Extract the two pawn positions of color P from the current board
 get_pawn_positions(CB, P, Pos) :-
