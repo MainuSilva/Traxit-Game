@@ -123,26 +123,38 @@ display_invalid_player:-
     write('Invalid input. Defaulting to white.'),
     nl.
 
-display_choose_card(CP) :-
+display_choose_card('b', WC, _BC) :-
     nl,
     write('______________________________________________________________________ '), nl,
-    write('|      1      |      2      |      3      |      4      |      5      |'), nl,
+    write('|      '),(member(1,WC)-> write('1');write('-')),write('      |      '),(member(2,WC) -> write('2');write('-')),write('       |      '),(member(3,WC) -> write('3');write('-')),write('      |      '),(member(4,WC) -> write('4');write('-')),write('      |      '),(member(5,WC) -> write('5');write('-')),write('      |'), nl,
     write('|     ___     |   _______   |         _   |  _________  |   _______   |'), nl,
     write('|    |.|.|    |  |.|_|_|_|  |   _____|.|  | |.|_|_|_|.| |  |_|_|_|_|  |'), nl,
     write('|             |        |.|  |  |.|_|_|_|  |             |  |.|   |.|  |'), nl,
     write('|_____________|_____________|_____________|_____________|_____________|'), nl,
-    write('|      6      |      7      |      8      |      9      |      10     |'), nl,
+    write('|      '),(member(6,WC)-> write('6');write('-')),write('      |      '),(member(7,WC) -> write('7');write('-')),write('       |      '),(member(8,WC) -> write('8');write('-')),write('      |      '),(member(9,WC)->write('9');write('-')),write('      |      '),(member(10,WC)->write('10'); write('--')),write('     |'), nl,
     write('|    _____    |        _    |    _____    |   _______   |        _    |'), nl,
     write('|   |.|_|_|   |    ___|.|   |   |.|_|.|   |  |.|_|_|_|  |      _|.|   |'), nl,
     write('|       |.|   |   |.|_|_|   |             |        |_|  |     |.|     |'), nl,
     write('|_____________|_____________|_____________|________|.|__|_____________|'), nl,
-    nl,       
-    (CP == 'b' ->
-        write('White player, choose a card for the black player: ')
-    ;
-     CP == 'w' ->
-        write('Black player, choose a card for the white player: ')
-    ). 
+    nl, 
+    write('White player, choose a card for the black player: '). 
+
+display_choose_card('w', _WC, BC) :-
+    nl,
+    write('______________________________________________________________________ '), nl,
+    write('|      '),(member(1,BC)-> write('1');write('-')),write('      |      '),(member(2,BC) -> write('2');write('-')),write('       |      '),(member(3,BC) -> write('3');write('-')),write('      |      '),(member(2,BC) -> write('4');write('-')),write('      |      '),(member(5,BC) -> write('5');write('-')),write('      |'), nl,
+    write('|     ___     |   _______   |         _   |  _________  |   _______   |'), nl,
+    write('|    |.|.|    |  |.|_|_|_|  |   _____|.|  | |.|_|_|_|.| |  |_|_|_|_|  |'), nl,
+    write('|             |        |.|  |  |.|_|_|_|  |             |  |.|   |.|  |'), nl,
+    write('|_____________|_____________|_____________|_____________|_____________|'), nl,
+    write('|      '),(member(6,BC)-> write('6');write('-')),write('      |      '),(member(7,BC) -> write('7');write('-')),write('       |      '),(member(8,BC) -> write('8');write('-')),write('      |      '),(member(9,BC)->write('9');write('-')),write('      |      '),(member(10,BC)->write('10'); write('--')),write('     |'), nl,
+    write('|    _____    |        _    |    _____    |   _______   |        _    |'), nl,
+    write('|   |.|_|_|   |    ___|.|   |   |.|_|.|   |  |.|_|_|_|  |      _|.|   |'), nl,
+    write('|       |.|   |   |.|_|_|   |             |        |_|  |     |.|     |'), nl,
+    write('|_____________|_____________|_____________|________|.|__|_____________|'), nl,
+    nl, 
+    write('Black player, choose a card for the white player: '). 
+
 
 display_choose_move(CP, C):-
     nl,
