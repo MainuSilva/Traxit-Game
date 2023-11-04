@@ -262,8 +262,8 @@ parse_square([H|T], C, R):-
     R is 8 - IR. % calculate row index
 
 change_round_score([CP, CB, R, WC, BC, WS, BS], [CP, CB, R, WC, BC, FWS, FBS]):-
-    value([CP, CB, R, WS, BS], w, WV),
-    value([CP, CB, R, WS, BS], b, BV),
+    value([CP, CB, R, WC, BC, WS, BS], w, WV),
+    value([CP, CB, R, WC, BC, WS, BS], b, BV),
     FWS is WS + WV,
     FBS is BS + BV.
 
