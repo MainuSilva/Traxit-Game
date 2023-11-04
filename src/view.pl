@@ -143,7 +143,7 @@ display_choose_card('b', WC, _BC) :-
 display_choose_card('w', _WC, BC) :-
     nl,
     write('______________________________________________________________________ '), nl,
-    write('|      '),(member(1,BC)-> write('1');write('-')),write('      |      '),(member(2,BC) -> write('2');write('-')),write('      |      '),(member(3,BC) -> write('3');write('-')),write('      |      '),(member(2,BC) -> write('4');write('-')),write('      |      '),(member(5,BC) -> write('5');write('-')),write('      |'), nl,
+    write('|      '),(member(1,BC)-> write('1');write('-')),write('      |      '),(member(2,BC) -> write('2');write('-')),write('      |      '),(member(3,BC) -> write('3');write('-')),write('      |      '),(member(4,BC) -> write('4');write('-')),write('      |      '),(member(5,BC) -> write('5');write('-')),write('      |'), nl,
     write('|     ___     |   _______   |         _   |  _________  |   _______   |'), nl,
     write('|    |.|.|    |  |.|_|_|_|  |   _____|.|  | |.|_|_|_|.| |  |_|_|_|_|  |'), nl,
     write('|             |        |.|  |  |.|_|_|_|  |             |  |.|   |.|  |'), nl,
@@ -160,7 +160,7 @@ display_choose_card('w', _WC, BC) :-
 display_choose_move(CP, C):-
     nl,
     format('Choose a move in algebraic notation using card ~w: ', [C]),
-    write('e.g., c1-d3'), nl,
+    write('e.g., c1-d3'), nl, nl,
     (CP == 'w' ->
         write('White player, make your move: ')
     ;
@@ -172,7 +172,7 @@ display_traxit(P1) :-
     nl,
     (P1 == 'w' -> OP = 'Black'; OP = 'White'),
     write('TRAXIT!'),
-    nl,
+    nl,nl,
     format("~w player choose one of your adversary's pawns to move to one of the corners in algebraic notation (corners: a1, h1, a8, h8): ", [OP]).
 
 

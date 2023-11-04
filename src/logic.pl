@@ -27,7 +27,7 @@ move_traxit([CP, CB, R, WC, BC, WS, BS], SC-SR-EC-ER, [CP, NB, R, WC, BC, WS, BS
 can_move([CP, CB, _, _, _, _, _], C-SC-SR-EC-ER):-
     nth0_nested(SR, SC, CB, CP),
     nth0_nested(ER, EC, CB, 'o'),
-    card_paths(C, SC, SR, AP), 
+    card_paths(C, SC, SR, AP),!,
     filter_paths(AP, EC, ER, CB, VP),
     VP \= [].
     
