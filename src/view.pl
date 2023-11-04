@@ -113,7 +113,8 @@ display_winner([_, _, _, _, _, WS, BS], W) :-
 % Define a predicate to display the score at the end of a scoring period.
 display_period_score([_, _, R, _, _, NWS, NBS]) :-
     nl, nl,
-    format("END OF ROUND ~d: Period Score: White: ~d - Black: ~d\n", [R, NWS, NBS]).
+    NR is R/4,
+    format("END OF ROUND ~d: Score: White: ~d - Black: ~d\n", [NR, NWS, NBS]).
  
 display_first_player:-
     nl,
