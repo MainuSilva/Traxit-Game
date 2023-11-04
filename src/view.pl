@@ -1,6 +1,6 @@
 %% display_logo
 % 
-% Displays the game logo and contact info
+% Displays the game logo
 %
 display_logo:-
     write('  _____                           _____ '), nl,
@@ -13,9 +13,9 @@ display_logo:-
 
 %% display_player_modes(+Color)
 %
-% Display player mode choice prompt
+% Display the player mode choice prompt for a specified player color.
 %
-% @param Color of the player this prompt refers to
+% @param Color
 display_player_modes(Color):-
     nl,
     write(' ( Input the option number to select it ) \n'),
@@ -27,9 +27,9 @@ display_player_modes(Color):-
 
 %% display_board(+GameState)
 %
-% Displays the CurentBoard in a game state and its evaluation. 
+% Displays the CurrentBoard in a GameState and its evaluation. 
 %
-% @param Game state
+% @param GameState
 display_board([CP, CB, _, _, _, _, _]):-
     nl,
     write('  |  A B C D E F G H  |'),
@@ -44,19 +44,17 @@ display_board([CP, CB, _, _, _, _, _]):-
 
 %% display_separator(+Size)
 %
-% Displays a horizontal separator of the specified width
+% Displays a horizontal separator for the game board.
 %
-% @param Size
 display_separator:-
     write('  +-------------------+'),
     nl.
 
-%% display_rows(+Board, +Row)
+%% display_rows(+Board)
 %
-% Displays the rows of the board.
+% Displays the rows of the game board.
 %
 % @param Board The game board
-% @param Row The current row
 display_rows([]).
 display_rows([Row | Rest]):-
     length([Row | Rest], N),
@@ -81,7 +79,7 @@ display_row(Row, N):-
 %
 % Displays the individual pieces on a row.
 %
-% @param Row The row to display
+% @param Row The row to display, represented as a list of pieces.
 display_pieces([]).
 display_pieces([w | Rest]):-
     put_char('w'),
@@ -96,34 +94,55 @@ display_pieces([Piece | Rest]):-
     put_char(' '),
     display_pieces(Rest).
         
-%% display_winner(+Winner)
+%% display_winner(+WhiteScore, +BlackScore, -Winner)
 %
-% Displays a string announcing the game winner and the final scores
+% Displays a string announcing the game winner and the final scores.
 %
-% @param Winner to congratulate
-display_winner([_, _, _, _, _, WS, BS], W) :-
+% @param WhiteScore The final score for the white player.
+% @param BlackScore The final score for the black player.
+% @param Winner The winner to congratulate or 'Tie' in case of a tie.
+display_winner(WS, BS, W) :-
     nl, nl,
     (W == 'Tie' ->
-        format("It's a tie! Final Score: ~d - ~d", [WS, BS])
+        format("It's a TIE! Final Score: ~d - ~d", [WS, BS])
     ;
-        format(" ~w has won the game! Final Score: ~d - ~d", [W, WS, BS])
+        format("CONGRATULATIONs, ~w has won the game! Final Score: ~d - ~d", [W, WS, BS])
     ),
-    display_logo, nl, nl.
+    nl, nl.
 
-% Define a predicate to display the score at the end of a scoring period.
+%% display_period_score(+GameState)
+%
+% Displays the score at the end of a scoring period.
+%
+% @param GameState
 display_period_score([_, _, R, _, _, NWS, NBS]) :-
     nl, nl,
     NR is R/4,
     format("END OF ROUND ~d: Score: White: ~d - Black: ~d\n", [NR, NWS, NBS]).
  
+%% display_first_player
+%
+% Displays a prompt to determine the first player.
+%
 display_first_player:-
     nl,
     write('Who plays first? (w/b): ').
 
+%% display_invalid_player
+%
+% Displays a message for an invalid player choice.
+%
 display_invalid_player:-
     write('Invalid input. Defaulting to white.'),
     nl.
 
+%% display_choose_card(+Player, +WhiteCards, +BlackCards)
+%
+% Displays a card selection prompt for the specified player and their available cards.
+%
+% @param Player
+% @param WhiteCards The list of available white player cards.
+% @param BlackCards The list of available black player cards.
 display_choose_card('b', WC, _BC) :-
     nl,
     write('______________________________________________________________________ '), nl,
@@ -139,7 +158,6 @@ display_choose_card('b', WC, _BC) :-
     write('|_____________|_____________|_____________|________|.|__|_____________|'), nl,
     nl, 
     write('White player, choose a card for the black player: '). 
-
 display_choose_card('w', _WC, BC) :-
     nl,
     write('______________________________________________________________________ '), nl,
@@ -156,7 +174,12 @@ display_choose_card('w', _WC, BC) :-
     nl, 
     write('Black player, choose a card for the white player: '). 
 
-
+%% display_choose_move(+CurrentPlayer, +Card)
+%
+% Displays a move selection prompt for the current player with the specified card.
+%
+% @param CurrentPlayer
+% @param Card
 display_choose_move(CP, C):-
     nl,
     format('Choose a move in algebraic notation using card ~w: ', [C]),
@@ -168,9 +191,14 @@ display_choose_move(CP, C):-
         write('Black player, make your move: ')
     ).
 
-display_traxit(P1) :-
+%% display_traxit(+Player)
+%
+% Displays a message indicating a "Traxit" move and prompts the player to choose their opponent's pawn's new position in one of the corners.
+%
+% @param Player
+display_traxit(P) :-
     nl,
-    (P1 == 'w' -> OP = 'Black'; OP = 'White'),
+    (P == 'w' -> OP = 'Black'; OP = 'White'),
     write('TRAXIT!'),
     nl,nl,
     format("~w player choose one of your adversary's pawns to move to one of the corners in algebraic notation (corners: a1, h1, a8, h8): ", [OP]).

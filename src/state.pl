@@ -3,9 +3,9 @@
 %% initial_state(-GameState)
 %
 % Generates an initial game state for Traxit
-% Uses a list containing 5 elements: Current player, Current board, Round, White Score and Black Score.
+% Uses a list containing 7 elements: Current player, Current board, Round, White Cards, Black Cards, White Score and Black Score.
 %
-% @param Initial game state
+% @param Initial GameState
 initial_state([_, B, 0, C, C, 0, 0]):-
     S = 8, % Board size 8x8
     C = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -22,36 +22,41 @@ initial_state([_, B, 0, C, C, 0, 0]):-
     replace_nested(5, 2, TB6, x, TB7),
     replace_nested(5, 5, TB7, x, B).
 
+%% game_over(+GameState, -Winner)
+%
+% Determines the winner of the Traxit game or if it's a tie based on the scores of White (WS) and Black (BS).
+%
+% @param GameState
+% @param Winner The winner of the game or 'Tie' in case of a tie.
 game_over([_, _, _, _, _, WS, BS], W) :-
     (WS > BS -> W = 'White';
      BS > WS -> W = 'Black';
      W = 'Tie').
 
-%% replicate_nested(?Height, ?Width, ?Elem, ?List)
+%% replicate_nested(+Height, +Width, +Element, -List)
 %
-% Creates/verifies 2 dimensional lists with a given element
+% Creates a 2-dimensional list with the given height and width, where each element is the specified element.
 %
-% @param Height
-% @param Width 
-% @param Elem
-% @param List
+% @param Height 
+% @param Width
+% @param Element 
+% @param List 
 replicate_nested(H, W, E, L):-
     replicate(W, E, R),
     replicate(H, R, L).
 
-% replicate(?Size, ?Elem, ?List)
+%% replicate(+Size, +Element, -List)
 %
-% Creates/verifies a list with a given size filled with a given element
+% Creates a list with the given size, where each element is the specified element.
 %
 % @param Size
-% @param Elem
+% @param Element
 % @param List
 replicate(S, E, L):-
     length(L, S),
     maplist(=(E), L).
 
-
-%% replace_nested(?Row, ?Column, ?List, ?Elem, ?NewList)
+%% replace_nested(+Row, +Column, +List, +NewElement, -NewList)
 %
 % Replaces/verifies an element in a 2-dimensional list
 %
