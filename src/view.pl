@@ -203,7 +203,10 @@ display_traxit(P) :-
     nl,nl,
     format("~w player choose one of your adversary's pawns to move to one of the corners in algebraic notation (corners: a1, h1, a8, h8): ", [OP]).
 
-
+display_move(CP, C) :-
+    (CP == 'w' -> P = 'White';  P = 'Black'),
+    nl,
+    format('Player ~w chooses the card ~d', [P, C]).
 
     
    

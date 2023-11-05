@@ -1,7 +1,7 @@
 :-ensure_loaded('view.pl').
 :-ensure_loaded('state.pl'). 
 :-ensure_loaded('logic.pl').
-
+:-ensure_loaded('bot.pl').
 
 %% valid_player_mode(+Mode)
 %
@@ -73,7 +73,8 @@ play_game([CP, CB, R, WC, BC, WS, BS]):-
         retractall(player(_,_))
     ;
         NR is R + 1,
-        play_round([CP, CB, NR, WC, BC, WS, BS], NGS),
+        get_current_player(CP, NR, P1),
+        play_round([P1, CB, NR, WC, BC, WS, BS], NGS),
         assertz(state(NGS)),
 
         % Check if we've played 4 rounds (end of a scoring period).
@@ -96,27 +97,61 @@ play_game([CP, CB, R, WC, BC, WS, BS]):-
 % @param Game State
 % @param New game state
 play_round([CP, CB, R, WC, BC, WS, BS], NGS) :-
-    get_current_player(CP, R, P1),
-    player(P1, 1), % human player
-    display_board([P1, CB, _, _, _, _,_]),
-    display_choose_card(P1, WC, BC), % Last player chooses next player's move.
-    repeat,
-    catch((get_card(P1, WC, BC, C)),_,(write('Invalid input. Try again\n'), fail)),
-    remove_card(P1, C, WC, BC, NWC, NBC),
+    player(CP, 1), % human player
+    display_board([CP, CB, _, _, _, _,_]),
+    choose_card(CP, WC, BC, NWC, NBC, C),
 
-    (verify_traxit(C, P1, CB) ->
-       display_traxit(P1),
-       repeat,
-       catch((get_traxit_move(M)),_,(write('Invalid input. Try again\n'), fail)),
-       traxit_move([P1, CB, R, NWC, NBC, WS, BS], M, NGS)
+    (verify_traxit([_, CB, _, _, _, _, _], CP, C) ->
+       choose_traxit_move([CP, CB, R, NWC, NBC, WS, BS], NGS)
     ;                         
-       display_choose_move(P1, C),
+       display_choose_move(CP, C),
        repeat,
        catch((get_move(C, M)),_,(write('Invalid input. Try again\n'), fail)),
-       try_move([P1, CB, R, NWC, NBC, WS, BS], M, NGS)
+       try_move([CP, CB, R, NWC, NBC, WS, BS], M, NGS)
     ),
     skip_line, !.
-   
+play_round([CP, CB, R, WC, BC, WS, BS], NGS) :-
+    player(CP, L), % computer player
+    display_board([CP, CB, _, _, _, _,_]),
+    choose_card(CP, WC, BC, NWC, NBC, C),
+    choose_move([CP, CB, _, _, _, _, _], L, C, P),
+    (P = [] ->
+        choose_traxit_move([CP, CB, R, NWC, NBC, WS, BS], NGS)
+    ;
+    parse_path(P, M),
+    display_move(CP,C),
+    move_bot([CP, CB, R, NWC, NBC, WS, BS], M, NGS)
+    ).
+
+
+choose_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
+     (CP == 'w'  -> LP = 'b' ; LP = 'w'),
+     player(LP, 1),
+     display_traxit(CP),
+     repeat,
+     catch((get_traxit_move(M)),_,(write('Invalid input. Try again\n'), fail)),
+     traxit_move([CP, CB, R, WC, BC, WS, BS], M, NGS).
+choose_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
+     (CP == 'w'  -> LP = 'b' ; LP = 'w'),
+     (player(LP, 2);
+      player(LP, 3)),
+     bot_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS).
+     
+choose_card(CP, WC, BC, NWC, NBC, C):-
+     (CP == 'w'  -> LP = 'b' ; LP = 'w'),
+     player(LP, 1),
+     display_choose_card(CP, WC, BC), % Last player chooses next player's move.
+     repeat,
+     catch((get_card(CP, WC, BC, C)),_,(write('Invalid input. Try again\n'), fail)),
+     remove_card(CP, C, WC, BC, NWC, NBC),
+     skip_line, !.
+choose_card(CP, WC, BC, NWC, NBC, C) :-
+     (CP == 'w'  -> LP = 'b' ; LP = 'w'),
+     (player(LP, 2);
+      player(LP, 3)),
+     random_card(CP, WC, BC, C),
+     remove_card(CP, C, WC, BC, NWC, NBC).
+         
 %% remove_card(+Player, +Card, +WhiteCards, +BlackCards, -NewWhiteCards, -NewBlackCards)
 %
 % Removes a card from the specified card list (WhiteCards or BlackCards) based on the player type.
