@@ -36,13 +36,13 @@ valid_card('b', C, WC, _BC):-
 menu:-
     display_logo,
     display_player_modes(w),
-    repeat,
     
+    repeat,
     catch((get_player_mode(MW)),_,(write('Invalid input. Try again\n'), fail)),
     assertz(player(w, MW)),
     display_player_modes(b),
-    repeat,
     
+    repeat,
     catch((get_player_mode(MB)),_,(write('Invalid input. Try again\n'), fail)),
     assertz(player(b, MB)),
     initial_state(GS),
@@ -153,7 +153,7 @@ remove_element(C, [H|T], [H|NT]) :- remove_element(C, T, NT).
 % @param Mode The chosen game mode.
 get_player_mode(M):-
     read(M),
-    (valid_player_mode(M) -> !; (write('Invalid Mode. Try again\n'), get_player_mode(M))).
+    (valid_player_mode(M) -> !; (write('Invalid Mode. Try again\n'), fail)).
 
 %% get_card(+Player, +WhiteCards, +BlackCards, -Card,)
 %

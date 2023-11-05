@@ -214,19 +214,19 @@ path_ends_in(P, FC, FR) :-
 % @param AllPaths 
 card_paths(1, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, 0]], AM),
-    generate_all_paths(SC, SR, AM, AP).
+    generate_all_paths(SC, SR, AM, AP), !.
 card_paths(2, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, 1]], AM1),
     generate_all_moves([[0, 0], [0, -1], [-1, -1], [-2, -1], [-3, -1]], AM2),
     generate_all_paths(SC, SR, AM1, AP1),
     generate_all_paths(SC, SR, AM2, AP2),
-    append(AP1, AP2, AP).                       
+    append(AP1, AP2, AP), !.                     
 card_paths(3, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, -1]], AM1),
     generate_all_moves([[0, 0], [0, 1], [-1, 1], [-2, 1], [-3, 1]], AM2),
     generate_all_paths(SC, SR, AM1, AP1),
     generate_all_paths(SC, SR, AM2, AP2),
-    append(AP1, AP2, AP).    
+    append(AP1, AP2, AP), !.   
 card_paths(4, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]], AM),
     generate_all_paths(SC, SR, AM, AP).
@@ -235,31 +235,31 @@ card_paths(5, SC, SR, AP) :-
     generate_all_moves([[0, 0], [0, -1], [-1, -1], [-2, -1], [-3, -1] , [-3, 0]], AM2),
     generate_all_paths(SC, SR, AM1, AP1),
     generate_all_paths(SC, SR, AM2, AP2),
-    append(AP1, AP2, AP). 
+    append(AP1, AP2, AP), !.
 card_paths(6, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, 0], [2, 0], [2, 1]], AM1),
     generate_all_moves([[0, 0], [0, -1], [-1, -1], [-2, -1]], AM2),
     generate_all_paths(SC, SR, AM1, AP1),
     generate_all_paths(SC, SR, AM2, AP2),
-    append(AP1, AP2, AP). 
+    append(AP1, AP2, AP), !. 
 card_paths(7, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, 0], [2, 0], [2, -1]], AM1),
     generate_all_moves([[0, 0], [0, 1], [-1, 1], [-2, 1]], AM2),
     generate_all_paths(SC, SR, AM1, AP1),
     generate_all_paths(SC, SR, AM2, AP2),
-    append(AP1, AP2, AP). 
+    append(AP1, AP2, AP), !. 
 card_paths(8, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, 0], [2, 0]], AM),
-    generate_all_paths(SC, SR, AM, AP).
+    generate_all_paths(SC, SR, AM, AP), !.
 card_paths(9, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, 0], [2, 0], [3, 0], [3, 1], [3, 2]], AM1),
     generate_all_moves([[0, 0], [0, -1], [0, -2], [-1, -2], [-2, -2], [-3, -2]], AM2),
     generate_all_paths(SC, SR, AM1, AP1),
     generate_all_paths(SC, SR, AM2, AP2),
-    append(AP1, AP2, AP). 
+    append(AP1, AP2, AP), !. 
 card_paths(10, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, -1]], AM),
-    generate_all_paths(SC, SR, AM, AP).
+    generate_all_paths(SC, SR, AM, AP), !.
 
 %% pawns_card_paths(+CardNumber, +Player, +CurrentBoard, -ValidPaths)
 %
