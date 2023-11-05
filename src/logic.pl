@@ -261,15 +261,15 @@ card_paths(10, SC, SR, AP) :-
     generate_all_moves([[0, 0], [1, -1]], AM),
     generate_all_paths(SC, SR, AM, AP), !.
 
-%% pawns_card_paths(+CardNumber, +Player, +CurrentBoard, -ValidPaths)
+%% valid_moves(+GameState, +Player, +Card, -ListOfMoves)
 %
 % Generates all valid paths for the two player's pawns using the specified card and current game board.
 %
-% @param Card
+% @param GameState
 % @param Player 
-% @param CurrentBoard
-% @param ValidPaths
-pawns_card_paths(C, P,  CB, VP) :-
+% @param Card
+% @param ListOfMoves
+valid_moves([_, CB, _, _, _, _, _], P, C, VP) :-
    get_pawn_positions(CB, P, Pos),
    nth0(0, Pos, [R1, C1]),
    nth0(1, Pos, [R2, C2]),
@@ -286,7 +286,7 @@ pawns_card_paths(C, P,  CB, VP) :-
 % @param Card
 % @param Player 
 % @param CurrentBoard              
-verify_traxit(C, P, CB) :- pawns_card_paths(C, P,  CB, []).
+verify_traxit([_, CB, _, _, _, _, _], P, C) :- valid_moves([_, CB, _, _, _, _, _], P,  C, []).
 
    
 %% nth0_nested(?Row, ?Col, ?List, ?Elem)

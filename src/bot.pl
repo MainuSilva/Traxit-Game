@@ -1,29 +1,65 @@
-:-ensure_loaded('logic.pl').
+:-use_module(library(random)).
 
-% Choose a move for the computer player based on the specified level.
-choose_move([_, CB, _, _, _, _, _], P, 1, C, M) :-
-    random_move([P, CB, _, _, _, _, _], P, C, M).
+move_bot([CP, CB, R, WC, BC, WS, BS], SC-SR-EC-ER, [CP, NB, R, WC, BC, WS, BS]):-
+    replace_nested(ER, EC, CB, CP, NB_),
+    replace_nested(SR, SC, NB_, o, NB).
 
-choose_move([_, CB, _, _, _, _, _], P, 2, C, M) :-
-    best_move([_, CB, _, _, _, _, _], P, C, M).
+choose_move([CP, CB, _, _, _, _, _], 3, C, M) :-
+    best_move([CP, CB, _, _, _, _, _], C, M).
+choose_move([CP, CB, _, _, _, _, _], 2, C, M) :-
+    random_move([CP, CB, _, _, _, _, _], C, M).
 
-% Generates a random move for the computer player.
-random_move([_, CB, _, _, _, _, _], P, M) :-
-    %igual a baixo mas a escolha é random
+% Finds the best greedy move for the computer player.
+best_move([CP, CB, _, _, _, _, _], C, M) :-
+    valid_moves([_, CB, _, _, _, _, _], CP, C, AP),
+    (AP = [] -> 
+        M = []
+    ;
+        find_best_move(AP, -1, [], M)
+    ).
+
+parse_path(M, SC-SR-EC-ER):-
+    M = [[SC, SR] | Rest],
+    last(Rest, [ER, EC]).
+  
+find_best_move([], _BS, BM, BM).    
+find_best_move([P | Rest], BS, BM, FM) :-
+    calculate_path_score(P, S),
+    (S > BS ->
+        find_best_move(Rest, S, P, FM)
+    ;
+        find_best_move(Rest, BS, BM, FM)
+    ).
+
+calculate_path_score(P, S) :-
+    last(P, [R, C]),
+    position_score(R, C, S). 
     
-
-% Finds the best move for the computer player.
-best_move([_, CB, _, _, _, _, _], P, C, M) :-
-    pawns_card_paths(C, P, CB, VP),
-    %recursão para ir por todos os da VP (all valid Path's) e fazer o calculate score
-    %calculate_score
-    %encapsular a calculate_score numa função que guarde o score máximo e o move correspondente que vai pro M
+random_move([CP, CB, _, _, _, _, _], C, M) :-
+    valid_moves([_, CB, _, _, _, _, _], CP, C, AP),
     
-all_scores([]).
-all_scores([Path|Rest], AS) :- 
-    last(Path, X),
-    nth0(0, X, CoordX),
-    nth0(1, X, last(Path, X), CoordY),
-    position_score(CoordX, CoordY, S),
-    all_scores(Rest).
+    (AP = [] -> 
+        M = []
+    ;
+        random_member(M, AP)
+    ).  
+
+random_card('w', _WC, BC, C):-
+    random_member(C, BC).
+random_card('b', WC, _BC, C):-
+    random_member(C, WC).
+    
+bot_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
+    random_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS).
+              
+random_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
+    get_pawn_positions(CB, CP, Pos),
+    random_member( [SR, SC], Pos),
+    random_member([ER, EC], [[0, 0], [0, 7], [7, 0], [7, 7]]),
+    nl,
+    write('TRAXIT!'),
+    nl,
+    format('Player ~w moves the enemy pawn', [CP]),
+    move_bot([CP, CB, R, WC, BC, WS, BS], SC-SR-EC-ER , NGS).                                    
+    
     
