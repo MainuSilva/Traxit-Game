@@ -314,6 +314,17 @@ parse_move(SS-ES, C, C-SC-SR-EC-ER):-
     atom_chars(ES, ES_),
     parse_square(SS_, SC, SR),
     parse_square(ES_, EC, ER).
+parse_move(SS-ES, SC-SR-EC-ER):-
+    char_code('a', AC),
+    char_code('1', ZC),
+    ISR is 8 - SR - 1,
+    IER is 8 - ER - 1,
+    SCC is AC + SC,
+    ECC is AC + EC,
+    SRC is ZC + ISR,
+    ERC is ZC + IER,
+    atom_codes(SS, [SCC,SRC]),
+    atom_codes(ES, [ECC,ERC]).
 
 %% traxit_parse_move(+StartSquare-EndSquare, -StartColumn-StartRow-EndColumn-EndRow)
 %
