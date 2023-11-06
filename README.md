@@ -232,7 +232,7 @@ White player, make your move: |: c1-b1.
 <pre><code>END OF ROUND 1: Score: White: 100 - Black: 50</code></pre>
 <pre><code>TRAXIT!</code></pre>
 <pre><code>CONGRATULATIONs, White has won the game! Final Score: 450 - 225</code></pre>
-<pre><code>Player White chooses the card 1</code></pre>
+<pre><code>Player White chooses the card 1 and moves from position e5 to d5</code></pre>
 
 
 **Error Messages**
