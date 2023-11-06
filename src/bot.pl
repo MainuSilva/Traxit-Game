@@ -108,6 +108,13 @@ random_move([CP, CB, _, _, _, _, _], C, M) :-
         random_member(M, AP)
     ).  
 
+%% get_bot_card(+GameState, +Level, -ChosenCard)
+%
+% Chooses a card for the opponent of the computer player.
+%
+% @param GameState 
+% @param Level
+% @param ChosenCard 
 get_bot_card([CP, _CB, _, WC, BC, _, _], 2, C):-
     random_card(CP, WC, BC, C).
 get_bot_card([CP, CB, _, WC, BC, _, _], 3, C):-
@@ -128,7 +135,7 @@ random_card('b', WC, _BC, C):-
 
 %% greedy_choose_card(+GameState, -Card)
 %
-% Chooses the best card for a player based on the current game state.
+% Chooses the worst card for the opponent player based on the current game state.
 %
 % @param GameState
 % @param Card
@@ -136,30 +143,28 @@ greedy_choose_card(['w', CB, _, _WC, BC, _, _], C):-
     BC = [UC | Rest],
     valid_moves([_, CB, _, _, _, _, _], 'w', C, VP),
     calculate_average_score(VP, AP),
-    choose_best_card(['w', CB, _, _, _, _, _], Rest, AP, UC).
+    choose_worst_card(['w', CB, _, _, _, _, _], Rest, AP, UC).
 greedy_choose_card(['b', CB, _, WC, _BC, _, _], C):-
     WC = [UC | Rest],
     valid_moves([_, CB, _, _, _, _, _], 'b', C, VP),
     calculate_average_score(VP, AP),
-    choose_best_card(['b', CB, _, _, _, _, _], Rest, AP, UC).
+    choose_worst_card(['b', CB, _, _, _, _, _], Rest, AP, UC).
 
-%% choose_best_card(+GameState, +CardList, +BestAverage, -BestCard)
+%% choose_worst_card(+GameState, +CardList, +BestAverage, -BestCard)
 %
-% Finds the best card for a player or computer player based on the game state and available cards.
+% Finds the worst card for the opponent player based on the game state and available cards.
 %
 % @param GameState 
 % @param CardList 
 % @param BestAverage
 % @param BestCard 
-choose_best_card(_, [], _, _).
-choose_best_card([CP, CB, _, _, _, _, _], [C | Rest], BA, MC) :-
+choose_worst_card(_, [], _, _).
+choose_worst_card([CP, CB, _, _, _, _, _], [C | Rest], BA, MC) :-
     valid_moves([_, CB, _, _, _, _, _], CP, C, VP),
     calculate_average_score(VP, AP),
     (AP < BA ->  NMC = C, NBA = AP; NMC = MC, NBA = BA),
-    choose_best_card([CP, CB, _, _, _, _, _], Rest, NBA, NMC).    
+    choose_worst_card([CP, CB, _, _, _, _, _], Rest, NBA, NMC).    
        
-
-   
 % bot_traxit_move(+GameState, +Level, -NewGameState)
 %
 % Performs a computer move when the computer is in traxit
