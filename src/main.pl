@@ -119,7 +119,8 @@ play_round([CP, CB, R, WC, BC, WS, BS], NGS) :-
         choose_traxit_move([CP, CB, R, NWC, NBC, WS, BS], NGS)
     ;
     parse_path(P, M),
-    display_move(CP,C),
+    parse_move(AM, M),
+    display_move(CP,C, AM),
     move_bot([CP, CB, R, NWC, NBC, WS, BS], M, NGS)
     ).
 
