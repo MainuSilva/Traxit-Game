@@ -76,6 +76,16 @@ calculate_path_score(P, S) :-
     last(P, [R, C]),
     position_score(R, C, S). 
 
+calculate_average_score(AP, AS) :-
+    calculate_average_score(AP, 0, 0, AS).
+calculate_average_score([], TS, NP, AS) :-
+    (NP = 0 -> AS = 0; AS is TS / NP).
+calculate_average_score([P | Rest], TS, NP, AS) :-
+    calculate_path_score(P, S),
+    NTS is TS + S,
+    NNP is NP + 1,
+    calculate_average_score(Rest, NTS, NNP, AS).
+
 % random_move(+GameState, +Card, -Move)
 %
 % Chooses a random valid move for the computer.
@@ -92,6 +102,11 @@ random_move([CP, CB, _, _, _, _, _], C, M) :-
         random_member(M, AP)
     ).  
 
+get_bot_card([CP, _CB, _, WC, BC, _, _], 2, C):-
+    random_card(CP, WC, BC, C).
+get_bot_card([CP, CB, _, WC, BC, _, _], 3, C):-
+    greedy_choose_card([CP, CB, _, WC, BC, _, _], C).
+
 %random_card(+Player, +WhiteCards, +BlackCards, -Card)
 %
 % Chooses a random card for the opponent
@@ -104,15 +119,38 @@ random_card('w', _WC, BC, C):-
     random_member(C, BC).
 random_card('b', WC, _BC, C):-
     random_member(C, WC).
-    
-%bot_traxit_move(+GameState, -NewGameState)
+
+greedy_choose_card(['w', CB, _, _WC, BC, _, _], C):-
+    BC = [UC | Rest],
+    valid_moves([_, CB, _, _, _, _, _], 'w', C, VP),
+    calculate_average_score(VP, AP),
+    choose_best_card(['w', CB, _, _, _, _, _], Rest, AP, UC).
+greedy_choose_card(['b', CB, _, WC, _BC, _, _], C):-
+    WC = [UC | Rest],
+    valid_moves([_, CB, _, _, _, _, _], 'b', C, VP),
+    calculate_average_score(VP, AP),
+    choose_best_card(['b', CB, _, _, _, _, _], Rest, AP, UC).
+
+choose_best_card(_, [], _, _).
+choose_best_card([CP, CB, _, _, _, _, _], [C | Rest], BA, MC) :-
+    valid_moves([_, CB, _, _, _, _, _], CP, C, VP),
+    calculate_average_score(VP, AP),
+    (AP < BA ->  NMC = C, NBA = AP; NMC = MC, NBA = BA),
+    choose_best_card([CP, CB, _, _, _, _, _], Rest, NBA, NMC).    
+       
+
+   
+%bot_traxit_move(+GameState, +Level, -NewGameState)
 %
 % Performs a computer move when the computer is in traxit
 %
 % @param GameState
+% @param Level
 % @param NewGameState
-bot_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
+bot_traxit_move([CP, CB, R, WC, BC, WS, BS], 2,  NGS):-
     random_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS).
+bot_traxit_move([CP, CB, R, WC, BC, WS, BS], 3,  NGS):-
+    greedy_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS).
 
 %random_traxit_move(+GameState, -NewGameState)
 %
@@ -124,11 +162,30 @@ random_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
     get_pawn_positions(CB, CP, Pos),
     random_member( [SR, SC], Pos),
     random_member([ER, EC], [[0, 0], [0, 7], [7, 0], [7, 7]]),
-    nl,
-    write('TRAXIT!'),
-    nl,
     parse_move(SS-ES, SC-SR-EC-ER),
-    format('Player ~w moves the enemy pawn from ~w to ~w', [CP, SS, ES]),
+    display_bot_traxit(CP,SS-ES),
+    move_bot([CP, CB, R, WC, BC, WS, BS], SC-SR-EC-ER , NGS). 
+
+% greedy_traxit_move(+GameState, -NewGameState)
+%
+% Chooses a Traxit move for the computer based on greediness, and displays it.
+%
+% @param GameState
+% @param NewGameState
+greedy_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
+    get_pawn_positions(CB, CP, Pos),
+    random_member([ER, EC], [[0, 0], [0, 7], [7, 0], [7, 7]]),                                
+    
+    nth0(0, Pos, P1),
+    calculate_path_score(P1, S1),
+
+    nth0(1, Pos, P2),
+    calculate_path_score(P2, S2),
+
+    (S1 > S2 -> [SR, SC] = P1; [SR, SC] = P2),
+     
+    parse_move(SS-ES, SC-SR-EC-ER),
+    display_bot_traxit(CP,SS-ES),
     move_bot([CP, CB, R, WC, BC, WS, BS], SC-SR-EC-ER , NGS).                                    
-    
-    
+                                           
+        

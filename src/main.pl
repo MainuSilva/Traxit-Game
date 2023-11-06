@@ -99,7 +99,7 @@ play_game([CP, CB, R, WC, BC, WS, BS]):-
 play_round([CP, CB, R, WC, BC, WS, BS], NGS) :-
     player(CP, 1), % human player
     display_board([CP, CB, _, _, _, _,_]),
-    choose_card(CP, WC, BC, NWC, NBC, C),
+    choose_card([CP, CB, R, WC, BC, WS, BS], NWC, NBC, C),
 
     (verify_traxit([_, CB, _, _, _, _, _], CP, C) ->
        choose_traxit_move([CP, CB, R, NWC, NBC, WS, BS], NGS)
@@ -113,7 +113,7 @@ play_round([CP, CB, R, WC, BC, WS, BS], NGS) :-
 play_round([CP, CB, R, WC, BC, WS, BS], NGS) :-
     player(CP, L), % computer player
     display_board([CP, CB, _, _, _, _,_]),
-    choose_card(CP, WC, BC, NWC, NBC, C),
+    choose_card([CP, CB, R, WC, BC, WS, BS], NWC, NBC, C),
     choose_move([CP, CB, _, _, _, _, _], L, C, P),
     (P = [] ->
         choose_traxit_move([CP, CB, R, NWC, NBC, WS, BS], NGS)
@@ -134,11 +134,10 @@ choose_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
      traxit_move([CP, CB, R, WC, BC, WS, BS], M, NGS).
 choose_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
      (CP == 'w'  -> LP = 'b' ; LP = 'w'),
-     (player(LP, 2);
-      player(LP, 3)),
-     bot_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS).
+     player(LP, L),
+     bot_traxit_move([CP, CB, R, WC, BC, WS, BS], L,  NGS).
      
-choose_card(CP, WC, BC, NWC, NBC, C):-
+choose_card([CP, _, _, WC, BC, _, _], NWC, NBC, C):-
      (CP == 'w'  -> LP = 'b' ; LP = 'w'),
      player(LP, 1),
      display_choose_card(CP, WC, BC), % Last player chooses next player's move.
@@ -146,11 +145,10 @@ choose_card(CP, WC, BC, NWC, NBC, C):-
      catch((get_card(CP, WC, BC, C)),_,(write('Invalid input. Try again\n'), fail)),
      remove_card(CP, C, WC, BC, NWC, NBC),
      skip_line, !.
-choose_card(CP, WC, BC, NWC, NBC, C) :-
+choose_card([CP, CB, _, WC, BC, _, _], NWC, NBC, C) :-
      (CP == 'w'  -> LP = 'b' ; LP = 'w'),
-     (player(LP, 2);
-      player(LP, 3)),
-     random_card(CP, WC, BC, C),
+     player(LP, L),
+     get_bot_card([CP, CB, _, WC, BC, _, _], L, C),
      remove_card(CP, C, WC, BC, NWC, NBC).
          
 %% remove_card(+Player, +Card, +WhiteCards, +BlackCards, -NewWhiteCards, -NewBlackCards)

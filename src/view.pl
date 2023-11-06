@@ -206,7 +206,12 @@ display_traxit(P) :-
 display_move(CP, C, SS-ES) :-
     (CP == 'w' -> P = 'White';  P = 'Black'),
     nl,
-    format('Player ~w chooses the card ~d and moves from position ~w to ~w', [P, C, SS, ES]).
+    format('Player ~w chooses the card ~d and moves from position ~w to ~w', [P, C, SS, ES]), nl.
 
-    
+display_bot_traxit(CP, SS-ES) :-
+    nl,
+    write('TRAXIT!'),
+    nl,
+    format('Player ~w moves the enemy pawn from ~w to ~w', [CP, SS, ES]).
+                  
    
