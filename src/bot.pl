@@ -127,7 +127,8 @@ random_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
     nl,
     write('TRAXIT!'),
     nl,
-    format('Player ~w moves the enemy pawn', [CP]),
+    parse_move(SS-ES, SC-SR-EC-ER),
+    format('Player ~w moves the enemy pawn from ~w to ~w', [CP, SS, ES]),
     move_bot([CP, CB, R, WC, BC, WS, BS], SC-SR-EC-ER , NGS).                                    
     
     
