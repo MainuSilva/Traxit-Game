@@ -20,7 +20,7 @@ best_move([CP, CB, _, _, _, _, _], C, M) :-
 
 parse_path(M, SC-SR-EC-ER):-
     M = [[SC, SR] | Rest],
-    last(Rest, [ER, EC]).
+    last(Rest, [EC, ER]).
   
 find_best_move([], _BS, BM, BM).    
 find_best_move([P | Rest], BS, BM, FM) :-
