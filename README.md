@@ -10,8 +10,8 @@
 
 |**Name**|**Contribution**|
 |---|---|
-| Maria Laranjeira | 30% |
-| Manuel Silva | 70% |
+| Maria Laranjeira | 50% |
+| Manuel Silva | 50% |
 
 ## Installation and Execution
 
