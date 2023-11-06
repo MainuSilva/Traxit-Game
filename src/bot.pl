@@ -76,6 +76,12 @@ calculate_path_score(P, S) :-
     last(P, [R, C]),
     position_score(R, C, S). 
 
+%% calculate_average_score(+Paths, -AverageScore)
+%
+% Calculates the average score of a list of paths.
+%
+% @param Paths
+% @param AverageScore 
 calculate_average_score(AP, AS) :-
     calculate_average_score(AP, 0, 0, AS).
 calculate_average_score([], TS, NP, AS) :-
@@ -120,6 +126,12 @@ random_card('w', _WC, BC, C):-
 random_card('b', WC, _BC, C):-
     random_member(C, WC).
 
+%% greedy_choose_card(+GameState, -Card)
+%
+% Chooses the best card for a player based on the current game state.
+%
+% @param GameState
+% @param Card
 greedy_choose_card(['w', CB, _, _WC, BC, _, _], C):-
     BC = [UC | Rest],
     valid_moves([_, CB, _, _, _, _, _], 'w', C, VP),
@@ -131,6 +143,14 @@ greedy_choose_card(['b', CB, _, WC, _BC, _, _], C):-
     calculate_average_score(VP, AP),
     choose_best_card(['b', CB, _, _, _, _, _], Rest, AP, UC).
 
+%% choose_best_card(+GameState, +CardList, +BestAverage, -BestCard)
+%
+% Finds the best card for a player or computer player based on the game state and available cards.
+%
+% @param GameState 
+% @param CardList 
+% @param BestAverage
+% @param BestCard 
 choose_best_card(_, [], _, _).
 choose_best_card([CP, CB, _, _, _, _, _], [C | Rest], BA, MC) :-
     valid_moves([_, CB, _, _, _, _, _], CP, C, VP),
@@ -140,7 +160,7 @@ choose_best_card([CP, CB, _, _, _, _, _], [C | Rest], BA, MC) :-
        
 
    
-%bot_traxit_move(+GameState, +Level, -NewGameState)
+% bot_traxit_move(+GameState, +Level, -NewGameState)
 %
 % Performs a computer move when the computer is in traxit
 %

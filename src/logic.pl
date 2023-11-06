@@ -314,6 +314,13 @@ parse_move(SS-ES, C, C-SC-SR-EC-ER):-
     atom_chars(ES, ES_),
     parse_square(SS_, SC, SR),
     parse_square(ES_, EC, ER).
+
+%% parse_move(-AlgebraicNotation, +Move)
+%
+% Parses a game move to a algebraic notation
+%
+% @param Algebraic notation
+% @param Move
 parse_move(SS-ES, SC-SR-EC-ER):-
     char_code('a', AC),
     char_code('1', ZC),

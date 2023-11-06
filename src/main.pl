@@ -125,6 +125,12 @@ play_round([CP, CB, R, WC, BC, WS, BS], NGS) :-
     ).
 
 
+%% choose_traxit_move(+GameState, -NewGameState)
+%
+% Allows a player to make a "Traxit" move or triggers the computer to make a "Traxit" move. Displays messages related to the move.
+%
+% @param GameState
+% @param NewGameState
 choose_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
      (CP == 'w'  -> LP = 'b' ; LP = 'w'),
      player(LP, 1),
@@ -137,6 +143,15 @@ choose_traxit_move([CP, CB, R, WC, BC, WS, BS],  NGS):-
      player(LP, L),
      bot_traxit_move([CP, CB, R, WC, BC, WS, BS], L,  NGS).
      
+
+%% choose_card(+GameState, -NewWhiteCards, -NewBlackCards, -ChosenCard)
+%
+% Allows a player to choose a card for their opponent. Displays messages related to the card selection.
+%
+% @param GameState
+% @param NewWhiteCards
+% @param NewBlackCards
+% @param ChosenCard
 choose_card([CP, _, _, WC, BC, _, _], NWC, NBC, C):-
      (CP == 'w'  -> LP = 'b' ; LP = 'w'),
      player(LP, 1),

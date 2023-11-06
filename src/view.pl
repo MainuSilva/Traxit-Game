@@ -203,11 +203,24 @@ display_traxit(P) :-
     nl,nl,
     format("~w player choose one of your adversary's pawns to move to one of the corners in algebraic notation (corners: a1, h1, a8, h8): ", [OP]).
 
+%% display_move(+CurrentPlayer, +Card, +AlgebraicNotation)
+%
+% Displays a message indicating a player's move with the chosen card and the pawn's movement.
+%
+% @param CurrentPlayer 
+% @param Card
+% @param AlgebraicNotation
 display_move(CP, C, SS-ES) :-
     (CP == 'w' -> P = 'White';  P = 'Black'),
     nl,
     format('Player ~w chooses the card ~d and moves from position ~w to ~w', [P, C, SS, ES]), nl.
 
+%% display_bot_traxit(+CurrentPlayer, +AlgebraicNotation)
+%
+% Displays a message indicating a "Traxit" move by the computer player and the pawn's movement.
+%
+% @param CurrentPlayer
+% @param AlgebraicNotation
 display_bot_traxit(CP, SS-ES) :-
     nl,
     write('TRAXIT!'),
