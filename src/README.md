@@ -227,11 +227,13 @@ White player, make your move: |: c1-b1.
 </code></pre>
 
 **Game Notifications**
-> `display_period_score`, `display_traxit`, `display_winner`
+> `display_period_score`, `display_traxit`, `display_winner`, `display_move`
 
 <pre><code>END OF ROUND 1: Score: White: 100 - Black: 50</code></pre>
 <pre><code>TRAXIT!</code></pre>
 <pre><code>CONGRATULATIONs, White has won the game! Final Score: 450 - 225</code></pre>
+<pre><code>Player White chooses the card 1</code></pre>
+
 
 **Error Messages**
 > `display_invalid_player`, and the input predicates
@@ -244,6 +246,56 @@ White player, make your move: |: c1-b1.
 
 The board and cards display, as showcased previously in the game states, are dynamic and change according to the game state. The board display is performed by the predicate `display_board` which calls the predicate `display_rows` for each row of the board. The pieces are placed on the board and displayed by the predicate `display_piece`.
 
+In case of a game against the computer, the computer's card choice is displayed, as shown in the last element of "**Game Notifications**". After a card is attributed to the computer, a new board is printed with the computer chosen move already performed.
+
+### Move Validation and Execution
+
+Standard Moves are executed by the predicate `move`, which given a Game State and a Move (specified in the form of "NumberCard-CurrentPosition-EndPosition") returns the resulting new Game State.
+A new move is only executed, however, firstly after being syntactically validated and parsed by `get_move` and then after the move in question is evaluated by the predicate that `move` calls, `can_move`.
+`can_move` fetches all the theoretical moves for the attributed tile path, and filters them, checking if there are no blockages in the path and storing all the possible ones in a list. Then, it checks if the move the player chose is in the list of possible moves. If it is, the move is executed, otherwise, the player is asked to choose another move.
+After the chosen move goes through `can_move` it is then realized by the predicate `replace_nested`.
+In a Traxit situation, a special move is executed, different from the standard, that does no obey any paths, and therefore there are two special predicates in charge of validating and executing it: `can_move_traxit` and `move_traxit`.  They both have the same function as their twin predicates, except that they are only called when a Traxit situation occurs. can_move_traxit checks if the chosen corner is free, and move_traxit moves the chosen pawn to the chosen corner.
+
+### List of Valid Moves
+
+Specially for the game in question, it is important to always keep track of the list of valid moves for each player, which has to be verified each round. That is because if that list is empty, the player is said to be in Traxit, a very characteristic situation of this game. In order to do so, every round, the predicate `verify_traxit` is called. This predicate calls `valid_moves`, which generates all valid paths for the two player's pawns using the specified card and current game board, and then verifies if the list of the generated valid paths is empty.
+
+### End of Game
+
+The game ends when a call to `game_over` is made. When round 16 is reached, the predicate `play_game` makes that call.
+`game_over` takes the final Game State and with the player's scores that the latter provides, determines who has more points and returns that player as the winner. If the scores are equal, it calls a tie. After `game_over`, the predicate `display_winner` is then called, which displays the winner or the tie, and the final score of each player, as displayed in the third element of the "**Game Notifications**" section.
+
+### Game State Evaluation
+
+Each round, the used path cards are discarded and the current player scores are stored.
+In order to calculate a player's points based on the sum of the points amounted by the position of their 2 pawns, the predicate `value` is called each round. Afterwards, `change_round_score` amounts the score obtained by `value` to the player's total score. A score is calculated by evalutating the coordinates of each pawn and concluding in which level they are. The higher level, the higher points. Each pawn's score is then calculated (by `position_score`) and summed up to the player's total round score (by `calculate_score`).
+In order to discard a card, once `choose_card` is called, the predicate `remove_card` is called, which removes the chosen card from the player's hand and returns the new hand. `choose_card` takes part of the predicate `play_round`.
+
+### Computer Moves
+
+Everything concerning Computer Moves is located in the `bot.pl` file.
+Computer move choices are performed by the predicate `choose_move`, which calls either `best_move` or `random_move` depending on the computer's chosen difficulty. `best_move` is in charge of choosing the best move for the computer. It gathers all the possible valid moves for each pawn and calculates which of those results' ending position translates into more points. That is the move chosen.
+`random _move`, on the other hand, works almost the same as `best_move`, except that it chooses a random move from the list of possible moves, rather than the best one. Therefore, best_move corresponds to the Hard Computer, and `random_move` to the Easy Computer.
+
+## Conclusion
+
+In conclusion, the game developed has successfully implemented the core mechanics and rules. It provides a robust and interactive platform for users to play the game, with both human and computer opponents. The game logic is well-structured and the code is modular, which makes it easy to understand and maintain.
+
+However, there are a few limitations to the current version of the program. The AI, while functional, could be improved. The best_move function, while it does choose the most beneficial move at the moment, does not take into account future rounds or the opponent's potential moves. This can lead to suboptimal play in certain situations.
+
+As for the roadmap, there are several improvements that could be made:
+
+Improve the AI: The AI could be improved by implementing a more advanced algorithm, such as Minimax or Alpha-Beta pruning, which would allow the computer to plan several moves ahead.
+Multiplayer Support: Adding support for more than two players could make the game more dynamic and interesting.
+Game Replay: Implementing a game replay feature would allow players to review their games and learn from their mistakes.
+
+Overall, while the game has room for improvement, it serves as a solid foundation for future development and enhancements.
+
+## Bibliography
+
+- Prolog Documentation. (n.d.). https://www.swi-prolog.org/pldoc/doc_for?object=manual
+- Stack Overflow. (n.d.). https://stackoverflow.com/
+- Geeks for Geeks. (n.d.). https://www.geeksforgeeks.org/
 
 
 

@@ -1,15 +1,36 @@
 :-use_module(library(random)).
 
+%% move_bot(+GameState, +Move, -NewGameState)
+%
+% Executes a computer move using a game state and returning a new state.
+%
+% @param GameState
+% @param Move
+% @param NewGameState
 move_bot([CP, CB, R, WC, BC, WS, BS], SC-SR-EC-ER, [CP, NB, R, WC, BC, WS, BS]):-
     replace_nested(ER, EC, CB, CP, NB_),
     replace_nested(SR, SC, NB_, o, NB).
 
+% choose_move(+GameState, +Level, +Card, -Move)
+%
+% Performs the move choice by the computer. Computer chooses best move for level 3 and a random move for level 2
+%
+% @param GameState
+% @param Level
+% @param Card
+% @param Move
 choose_move([CP, CB, _, _, _, _, _], 3, C, M) :-
     best_move([CP, CB, _, _, _, _, _], C, M).
 choose_move([CP, CB, _, _, _, _, _], 2, C, M) :-
     random_move([CP, CB, _, _, _, _, _], C, M).
 
+% best_move(+GameState, +Card, -Move)
+%
 % Finds the best greedy move for the computer player.
+%
+% @param GameState
+% @param Card
+% @param Move
 best_move([CP, CB, _, _, _, _, _], C, M) :-
     valid_moves([_, CB, _, _, _, _, _], CP, C, AP),
     (AP = [] -> 
@@ -17,6 +38,7 @@ best_move([CP, CB, _, _, _, _, _], C, M) :-
     ;
         find_best_move(AP, -1, [], M)
     ).
+
 
 parse_path(M, SC-SR-EC-ER):-
     M = [[SC, SR] | Rest],
@@ -31,10 +53,20 @@ find_best_move([P | Rest], BS, BM, FM) :-
         find_best_move(Rest, BS, BM, FM)
     ).
 
+% calculate_path_score(+Path, -Score)
+%
+% Calculates the resulting score of following a determined path.
+%
+% @param Path
+% @param Score                                        
 calculate_path_score(P, S) :-
     last(P, [R, C]),
     position_score(R, C, S). 
-    
+
+%random_move(+GameState, +Card, -Move)
+%
+% 
+%    
 random_move([CP, CB, _, _, _, _, _], C, M) :-
     valid_moves([_, CB, _, _, _, _, _], CP, C, AP),
     
